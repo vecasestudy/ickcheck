@@ -10,8 +10,8 @@ Ick Check is a mobile web app for checking the ingredients in beauty and persona
 
 ## Copyright
 
-© 2026 [Your Legal Name]. All rights reserved.
+© 2026 V. Herman. All rights reserved.
 
 This repository is public so the site can be hosted, but no license is granted. You may view the code. You may not copy, modify, distribute, or use it, or the Ick Check name, design, or content, without written permission.
 
-"Ick Check" and the Ick Check logo are trademarks of [Your Legal Name].
+"Ick Check" and the Ick Check logo are trademarks of V. Herman.
