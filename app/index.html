@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ick Check: is your routine actually clean?</title>
+<meta name="description" content="Scan a skincare, hair or body product and see which ingredients show up on public watch lists. Build your routine scorecard and share it.">
+<meta name="theme-color" content="#14110F">
+<meta name="copyright" content="© 2026 [Your Legal Name]. All rights reserved.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ick Check">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<!-- Link previews (LinkedIn, Pinterest, iMessage, Slack). After you publish,
+     these point to the live address:
+     https://ickcheck.ai/app/ -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ick Check">
+<meta property="og:title" content="Ick Check: is your routine actually clean?">
+<meta property="og:description" content="Scan a label. See what got flagged. Share your routine scorecard.">
+<meta property="og:url" content="https://ickcheck.ai/app/">
+<meta property="og:image" content="https://ickcheck.ai/app/images/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ick Check: Is your routine actually clean?">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ickcheck.ai/app/images/og-image.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14110F; --ink-2:#2A2420; --cream:#FFF6E6; --lime:#D7FF3A; --lilac:#B9A6FF;
+  --pink:#FF9AD0; --orange:#FF6A3D; --peach:#FFE2D6; --mint:#E6F8B8;
+  --muted-dark:#CFC6B6; --muted-light:#4A433B; --stage:#EDE6D8;
+  --display:'Bricolage Grotesque', system-ui, sans-serif; --mono:'Space Mono', ui-monospace, monospace;
+  --gutter:22px;
+  --safe-top:env(safe-area-inset-top, 0px); --safe-bottom:env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--stage);font-family:var(--display);color:var(--ink);display:flex;align-items:center;justify-content:center;padding:24px;-webkit-tap-highlight-color:transparent}
+h1,h2,p{margin:0}
+h1,p,div,span{text-wrap:pretty}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--lilac);outline-offset:2px}
+[hidden]{display:none!important}
+
+/* Desktop and tablet: a phone-sized frame centered on the page.
+   Phones: the app fills the whole screen. */
+.phone{width:390px;height:min(844px, calc(100dvh - 48px));min-height:640px;position:relative;overflow:hidden;background:var(--ink);border-radius:36px;box-shadow:0 20px 60px rgba(20,17,15,.25)}
+@media (max-width:520px){
+  body{padding:0;display:block;background:var(--ink)}
+  .phone{width:100%;height:100dvh;min-height:0;border-radius:0;box-shadow:none}
+}
+@media (max-width:360px){:root{--gutter:16px}.tab{font-size:13.5px;padding:0 4px}.share-act{font-size:12.5px}.share-act .circ{width:52px;height:52px}}
+.tab{white-space:nowrap}
+.screen{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.pad{min-height:100%;padding:calc(24px + var(--safe-top)) var(--gutter) calc(28px + var(--safe-bottom));display:flex;flex-direction:column}
+
+.logo{display:flex;align-items:center;gap:8px}
+.logo-mark{width:34px;height:34px;border-radius:50%;background:var(--lime);border:2.5px solid var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wordmark{font-weight:800;font-size:28px;letter-spacing:-.03em}
+.topbar{display:flex;align-items:center;justify-content:space-between}
+.topbar .wordmark{font-size:26px}
+.icon-btn{width:44px;height:44px;border-radius:50%;border:2.5px solid currentColor;background:transparent;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0}
+.spacer44{width:44px}
+.mono-label{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.06em}
+.btn-primary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:58px;padding:0 20px;border:none;border-radius:18px;background:var(--ink);color:var(--cream);font-weight:800;font-size:19px;text-align:left}
+.btn-outline{width:100%;min-height:52px;border:2.5px solid var(--ink);border-radius:18px;background:transparent;font-weight:600;font-size:16px}
+.btn-link{min-height:44px;border:none;background:transparent;font-weight:600;font-size:15px;text-decoration:underline}
+.chip{border:2px solid var(--ink);border-radius:999px;padding:5px 12px;font-weight:600;font-size:14px}
+.chip.flag{background:var(--orange);font-weight:800}
+.pill{flex-shrink:0;font-weight:800;font-size:13px;border-radius:999px;padding:4px 11px;color:var(--ink);white-space:nowrap}
+.pill.flag{background:var(--orange)}
+.pill.clear{background:var(--lime)}
+.stack{display:flex;flex-direction:column;gap:12px}
+
+/* Home */
+#home{background:var(--cream)}
+#home .pad{gap:28px}
+.headline{font-weight:800;font-size:clamp(32px, 10.6vw, 42px);line-height:1.02;letter-spacing:-.04em}
+.headline .line{display:block;white-space:nowrap}
+.headline .line+.line{margin-top:8px}
+.sticker{display:inline-block;background:var(--lime);border:2.5px solid var(--ink);border-radius:14px;padding:0 10px 4px;transform:rotate(-3deg)}
+.sub{font-size:19px;line-height:1.3;font-weight:600;margin-top:14px}
+.cta{min-height:64px;padding:0 22px;border-radius:20px;font-size:21px;box-shadow:5px 5px 0 var(--lilac)}
+.cta-arrow{width:38px;height:38px;border-radius:50%;background:var(--lime);color:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.alt{font-size:17px;border-radius:20px}
+.stat{background:var(--ink);color:var(--cream);border-radius:26px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.stat-row{display:flex;align-items:center;gap:14px}
+.stat-num{font-weight:800;font-size:clamp(56px, 18vw, 72px);line-height:.9;letter-spacing:-.05em;color:var(--lime);flex-shrink:0}
+.stat-text{font-size:16.5px;line-height:1.3;font-weight:600}
+.stat-src{font-family:var(--mono);font-size:10.5px;line-height:1.5;color:#B7AE9F}
+.steps{display:flex;gap:10px}
+.step{flex:1;min-width:0;border:2.5px solid var(--ink);border-radius:18px;padding:14px 12px;display:flex;flex-direction:column;gap:6px}
+.step b{font-weight:800;font-size:26px;line-height:1}
+.step span{font-weight:800;font-size:17px;line-height:1.1}
+.score-teaser{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;border-radius:22px;padding:18px 20px;text-align:left}
+.score-teaser.filled{background:var(--ink);color:var(--cream);border:none}
+.score-teaser.empty{background:transparent;border:2.5px dashed var(--ink)}
+.score-teaser .t1{margin-bottom:4px}
+.score-teaser.filled .t1{color:var(--lime)}
+.score-teaser .t2{font-weight:600;font-size:17px;line-height:1.2}
+.score-teaser .big{font-weight:800;font-size:54px;line-height:1;color:var(--lime);letter-spacing:-.04em}
+.fine{font-family:var(--mono);font-size:11.5px;line-height:1.5;color:var(--muted-light)}
+
+/* Scanner */
+#scanner{background:var(--ink);color:var(--cream)}
+#scanner .wrap{min-height:100%;display:flex;flex-direction:column}
+.scan-head{padding:calc(22px + var(--safe-top)) var(--gutter) 0;display:flex;flex-direction:column;gap:16px}
+.tabs{display:flex;gap:8px}
+.tab{flex:1;min-height:44px;border:2px solid var(--cream);background:transparent;color:var(--cream);border-radius:999px;font-weight:600;font-size:15px;padding:0 8px}
+.tab[aria-pressed="true"]{border-color:var(--lime);background:var(--lime);color:var(--ink);font-weight:800}
+.cam{margin:18px var(--gutter) 0;position:relative;border-radius:28px;background:var(--ink-2);overflow:hidden}
+.cam.tall{flex:1 1 auto;min-height:300px;margin-bottom:calc(28px + var(--safe-bottom))}
+.cam.short{height:200px;flex-shrink:0}
+.cam svg.code{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:100%}
+.corner{position:absolute;width:38px;height:38px;border:0 solid var(--lime)}
+.corner.tl{left:28px;top:28px;border-left-width:5px;border-top-width:5px;border-top-left-radius:14px}
+.corner.tr{right:28px;top:28px;border-right-width:5px;border-top-width:5px;border-top-right-radius:14px}
+.corner.bl{left:28px;bottom:28px;border-left-width:5px;border-bottom-width:5px;border-bottom-left-radius:14px}
+.corner.br{right:28px;bottom:28px;border-right-width:5px;border-bottom-width:5px;border-bottom-right-radius:14px}
+.tap{position:absolute;left:50%;transform:translateX(-50%);bottom:72px;width:160px;min-height:44px;border:2px solid var(--ink);background:var(--lime);color:var(--ink);border-radius:999px;font-weight:800;font-size:16px}
+.cam-label{position:absolute;left:0;right:0;text-align:center;font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.06em}
+.cam.tall .cam-label{bottom:36px;color:var(--cream)}
+.cam.short .cam-label{bottom:14px;color:var(--lime)}
+.paste{padding:22px var(--gutter) calc(24px + var(--safe-bottom));display:flex;flex-direction:column;gap:16px}
+.field{display:flex;flex-direction:column;gap:8px}
+.field .mono-label{color:var(--lime)}
+.input{width:100%;border:2px solid #4A433B;border-radius:16px;background:var(--ink-2);color:var(--cream);outline:none}
+.input:focus{border-color:var(--lime)}
+.input::placeholder{color:#8F8575}
+input.input{min-height:52px;padding:0 16px;font-weight:600;font-size:17px}
+textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono);font-size:16px;line-height:1.5}
+.paste-meta{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.paste-meta .count{font-family:var(--mono);font-size:12px;color:var(--muted-dark)}
+.ghost-pill{min-height:44px;padding:0 16px;border:2px solid var(--cream);background:transparent;color:var(--cream);border-radius:999px;font-weight:600;font-size:14px}
+.err{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--pink)}
+.btn-lime{background:var(--lime);color:var(--ink)}
+.drawer{margin-top:20px;flex:1;background:var(--cream);color:var(--ink);border-radius:30px 30px 0 0;padding:22px var(--gutter) calc(24px + var(--safe-bottom));display:flex;flex-direction:column;gap:14px}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--lime);border:2px solid var(--ink);border-radius:999px;padding:3px 10px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.05em}
+.found-name{font-weight:800;font-size:25px;letter-spacing:-.02em;line-height:1.1;margin-top:4px;overflow-wrap:anywhere}
+.found-count{flex-shrink:0;text-align:right;font-family:var(--mono);font-size:11.5px;line-height:1.4;color:var(--muted-light)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.note{border:2px solid var(--ink);border-radius:16px;padding:12px 14px;font-size:14.5px;line-height:1.35}
+.note.flag{background:var(--peach)}
+.note.clear{background:var(--mint)}
+.add{box-shadow:4px 4px 0 var(--lilac)}
+
+/* Scorecard */
+#scorecard{background:var(--lime)}
+#scorecard .pad{gap:18px}
+#scorecard .icon-btn{color:var(--ink)}
+.shared-chip{align-self:flex-start;background:var(--ink);color:var(--lime);border-radius:999px;padding:6px 12px}
+.card{background:var(--ink);color:var(--cream);border-radius:30px;padding:24px 22px 22px;display:flex;flex-direction:column;gap:18px;box-shadow:6px 6px 0 var(--lilac)}
+.card h1{font-weight:800;font-size:36px;line-height:1;letter-spacing:-.035em}
+.card .by{font-size:14px;color:var(--muted-dark);margin-top:6px}
+.total{display:flex;align-items:center;gap:14px;background:var(--ink-2);border-radius:22px;padding:14px 18px}
+.total .n{font-weight:800;font-size:88px;line-height:.9;letter-spacing:-.05em;color:var(--lime)}
+.total .tag{background:var(--pink);color:var(--ink);border-radius:10px;padding:3px 10px 4px;font-weight:800;font-size:17px;transform:rotate(-3deg);display:inline-block}
+.total .split{font-size:13.5px;line-height:1.35;color:#E8E0D2;margin-top:8px}
+.rows{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.row .name{font-weight:800;font-size:17px;overflow-wrap:anywhere}
+.row .detail{font-size:13px;line-height:1.35;color:var(--muted-dark);margin-top:2px}
+.dash{border-top:2px dashed #5A5046}
+.disclaim{font-size:11.5px;line-height:1.5;color:var(--muted-dark)}
+.sample{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--lilac);margin-top:6px}
+.empty-card{padding:32px 22px}
+.empty-card p{font-size:16px;line-height:1.4;color:#E8E0D2}
+.share-nudge{font-weight:600;font-size:15px;line-height:1.3;text-align:center}
+.share-btn{box-shadow:4px 4px 0 var(--pink)}
+
+/* Share sheet */
+#share{position:absolute;inset:0;z-index:5}
+.scrim{position:absolute;inset:0;border:none;padding:0;background:rgba(20,17,15,.62)}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:92%;overflow-y:auto;background:var(--cream);color:var(--ink);border-radius:30px 30px 0 0;padding:12px var(--gutter) calc(26px + var(--safe-bottom));display:flex;flex-direction:column;gap:16px}
+.grab{align-self:center;width:44px;height:5px;border-radius:3px;background:var(--ink);opacity:.25}
+.sheet h2{font-weight:800;font-size:26px;letter-spacing:-.03em;line-height:1.05}
+.preview{display:flex;align-items:center;gap:14px;background:var(--ink);color:var(--cream);border-radius:22px;padding:16px 18px;box-shadow:4px 4px 0 var(--lilac)}
+.preview .n{font-weight:800;font-size:64px;line-height:.9;letter-spacing:-.05em;color:var(--lime)}
+.preview .t{font-weight:800;font-size:17px;line-height:1.1}
+.preview .s{font-size:13px;line-height:1.3;color:#E8E0D2;margin-top:4px}
+.link-box{width:100%;border:2px solid var(--ink);border-radius:14px;padding:10px 14px;font-family:var(--mono);font-size:12.5px;font-weight:700;background:transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.share-actions{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:6px}
+.share-act{display:flex;flex-direction:column;align-items:center;gap:8px;border:none;background:transparent;padding:0;font-weight:600;font-size:13.5px;line-height:1.15;text-align:center}
+.share-act .circ{width:58px;height:58px;border-radius:50%;border:2.5px solid var(--ink);display:flex;align-items:center;justify-content:center}
+.toast{align-self:center;background:var(--lime);border:2px solid var(--ink);border-radius:999px;padding:6px 16px;font-family:var(--mono);font-size:12px;font-weight:700;text-align:center}
+.done{justify-content:center;font-size:17px;min-height:52px}
+
+/* Desktop: a side panel that sends people to their phone */
+.desk{display:none}
+@media (min-width:900px) and (hover:hover) and (pointer:fine){
+  body{gap:64px}
+  .desk{display:flex;flex-direction:column;gap:18px;width:340px;color:var(--ink)}
+}
+.desk h2{font-weight:800;font-size:34px;line-height:1.02;letter-spacing:-.035em}
+.desk p{font-size:17px;line-height:1.4;font-weight:600}
+.qr{background:#fff;border:3px solid var(--ink);border-radius:24px;padding:28px;width:224px;box-shadow:6px 6px 0 var(--lilac)}
+.qr svg{display:block;width:100%;height:auto}
+.desk-link{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.desk-url{font-family:var(--mono);font-size:14px;font-weight:700}
+.desk-copy{min-height:44px;padding:0 16px;border:2.5px solid var(--ink);border-radius:999px;background:transparent;font-weight:700;font-size:14px}
+.desk-msg{font-family:var(--mono);font-size:12px;font-weight:700}
+.store-row{display:flex;flex-wrap:wrap;gap:10px}
+.store{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 16px;border:2.5px solid var(--ink);border-radius:14px;font-weight:700;font-size:15px}
+.store small{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;background:var(--lime);border:2px solid var(--ink);border-radius:999px;padding:1px 8px}
+</style>
+</head>
+<body>
+<main class="phone" aria-label="Ick Check">
+
+<!-- HOME -->
+<section class="screen" id="home" aria-label="Home">
+<div class="pad">
+  <div class="logo">
+    <div class="logo-mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c3 4 6 6.5 6 10.5a6 6 0 0 1-12 0C6 9.5 9 7 12 3z"/></svg></div>
+    <div class="wordmark">ick check</div>
+  </div>
+  <div>
+    <h1 class="headline"><span class="line">Is your routine</span><span class="line">actually <span class="sticker">clean?</span></span></h1>
+    <p class="sub">Scan a label. See what got&nbsp;flagged.</p>
+  </div>
+  <div class="stack">
+    <button type="button" class="btn-primary cta" data-go="scan">
+      <span>Scan a label</span>
+      <span class="cta-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+    <button type="button" class="btn-outline alt" data-go="paste">Paste ingredients instead</button>
+  </div>
+  <div class="stat">
+    <div class="stat-row">
+      <div class="stat-num">43%</div>
+      <div class="stat-text">of Gen Z look for "non-toxic" claims. Claims are not proof. Ingredients&nbsp;are.</div>
+    </div>
+    <div class="stat-src">Attest, US 18 to 27, n=1,000, Feb 2026</div>
+  </div>
+  <div class="steps">
+    <div class="step" style="background:var(--pink);transform:rotate(-2deg)"><b>1</b><span>Scan</span></div>
+    <div class="step" style="background:var(--lime);transform:rotate(1.5deg)"><b>2</b><span>Spot flags</span></div>
+    <div class="step" style="background:var(--lilac);transform:rotate(-1deg)"><b>3</b><span>Share</span></div>
+  </div>
+  <button type="button" class="score-teaser empty" id="teaserEmpty" data-go="scan">
+    <div><div class="mono-label t1">YOUR SCORECARD</div><div class="t2">Scan your first&nbsp;product</div></div>
+  </button>
+  <button type="button" class="score-teaser filled" id="teaserFilled" data-go="scorecard" hidden>
+    <div><div class="mono-label t1">YOUR SCORECARD</div><div class="t2" id="teaserLine"></div></div>
+    <div class="big" id="teaserNum">0</div>
+  </button>
+  <p class="fine">Flags are not safety verdicts or medical&nbsp;advice. Sample&nbsp;data.</p>
+  <p class="fine">© 2026 [Your Legal Name]. All rights reserved. Ick&nbsp;Check™</p>
+</div>
+</section>
+
+<!-- SCANNER -->
+<section class="screen" id="scanner" aria-label="Scanner" hidden>
+<div class="wrap">
+  <div class="scan-head">
+    <div class="topbar">
+      <button type="button" class="icon-btn" data-go="home" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+      <div class="wordmark">ick check</div>
+      <div class="spacer44"></div>
+    </div>
+    <div class="tabs" role="group" aria-label="Input method">
+      <button type="button" class="tab" id="tabScan" data-mode="scan" aria-pressed="true">Scan barcode</button>
+      <button type="button" class="tab" id="tabPaste" data-mode="paste" aria-pressed="false">Paste ingredients</button>
+    </div>
+  </div>
+
+  <div class="cam tall" id="camTall">
+    <svg class="code" width="346" height="270" viewBox="0 0 346 270" aria-hidden="true"><g fill="#6B6055"><rect x="108" y="86" width="5" height="78"/><rect x="118" y="86" width="3" height="78"/><rect x="126" y="86" width="7" height="78"/><rect x="138" y="86" width="3" height="78"/><rect x="146" y="86" width="5" height="78"/><rect x="157" y="86" width="9" height="78"/><rect x="171" y="86" width="3" height="78"/><rect x="179" y="86" width="6" height="78"/><rect x="190" y="86" width="3" height="78"/><rect x="198" y="86" width="8" height="78"/><rect x="211" y="86" width="4" height="78"/><rect x="220" y="86" width="5" height="78"/><rect x="230" y="86" width="3" height="78"/></g><rect x="60" y="130" width="226" height="4" rx="2" fill="#D7FF3A"/></svg>
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <button type="button" class="tap" id="tapScan">Tap to scan</button>
+    <div class="cam-label">POINT AT THE BARCODE</div>
+  </div>
+
+  <div class="cam short" id="camShort" hidden>
+    <svg class="code" width="346" height="270" viewBox="0 0 346 270" aria-hidden="true"><g fill="#6B6055"><rect x="108" y="86" width="5" height="78"/><rect x="118" y="86" width="3" height="78"/><rect x="126" y="86" width="7" height="78"/><rect x="138" y="86" width="3" height="78"/><rect x="146" y="86" width="5" height="78"/><rect x="157" y="86" width="9" height="78"/><rect x="171" y="86" width="3" height="78"/><rect x="179" y="86" width="6" height="78"/><rect x="190" y="86" width="3" height="78"/><rect x="198" y="86" width="8" height="78"/><rect x="211" y="86" width="4" height="78"/><rect x="220" y="86" width="5" height="78"/><rect x="230" y="86" width="3" height="78"/></g><rect x="60" y="130" width="226" height="4" rx="2" fill="#D7FF3A"/></svg>
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="cam-label">GOT IT</div>
+  </div>
+
+  <form class="paste" id="pasteForm" hidden novalidate>
+    <div class="field">
+      <label class="mono-label" for="pasteName">WHAT IS IT? (OPTIONAL)</label>
+      <input class="input" id="pasteName" type="text" placeholder="Night cream" autocomplete="off" maxlength="60">
+    </div>
+    <div class="field">
+      <label class="mono-label" for="pasteText">INGREDIENT LIST</label>
+      <textarea class="input" id="pasteText" placeholder="Water, Glycerin, Shea Butter..."></textarea>
+      <div class="paste-meta">
+        <div class="count" id="pasteCount">0 ingredients</div>
+        <button type="button" class="ghost-pill" id="tryExample">Try an example</button>
+      </div>
+    </div>
+    <div class="err" id="pasteErr" role="alert" hidden>Paste an ingredient list first.</div>
+    <button type="submit" class="btn-primary btn-lime">
+      <span>Check ingredients</span>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </form>
+
+  <div class="drawer" id="drawer" hidden>
+    <div class="drawer-head">
+      <div>
+        <div class="badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg><span id="foundBadge">FOUND IT</span></div>
+        <div class="found-name" id="foundName"></div>
+      </div>
+      <div class="found-count"><span id="foundCount"></span><br>checked</div>
+    </div>
+    <div class="chips" id="foundChips"></div>
+    <div class="note" id="foundNote"></div>
+    <div class="stack" style="gap:10px;margin-top:2px">
+      <button type="button" class="btn-primary add" id="addBtn">
+        <span>Add to my scorecard</span>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D7FF3A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+      <button type="button" class="btn-outline" id="againBtn">Scan again</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- SCORECARD -->
+<section class="screen" id="scorecard" aria-label="Scorecard" hidden>
+<div class="pad">
+  <div class="topbar">
+    <button type="button" class="icon-btn" data-go="home" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div class="wordmark">ick check</div>
+    <div class="spacer44"></div>
+  </div>
+
+  <div class="mono-label shared-chip" id="sharedChip" hidden>SHARED WITH YOU</div>
+
+  <div class="card" id="cardFilled" hidden>
+    <div>
+      <h1>My routine<br>scorecard</h1>
+      <div class="by" id="byLine"></div>
+    </div>
+    <div class="total">
+      <div class="n" id="totalNum">0</div>
+      <div><span class="tag" id="flagsWord">flags found</span><div class="split" id="splitLine"></div></div>
+    </div>
+    <div class="rows" id="rows"></div>
+    <div class="dash"></div>
+    <div>
+      <div class="disclaim">Flags come from public lists. Not a safety verdict or medical&nbsp;advice.</div>
+      <div class="sample">SAMPLE DATA FOR DESIGN REVIEW</div>
+    </div>
+  </div>
+
+  <div class="card empty-card" id="cardEmpty">
+    <h1>My routine<br>scorecard</h1>
+    <p>Nothing here yet. Scan a label to start your&nbsp;scorecard.</p>
+  </div>
+
+  <div class="stack" style="gap:10px">
+    <div id="shareGroup" class="stack" style="gap:10px" hidden>
+      <div class="share-nudge">Send it to the friend who needs to see their&nbsp;shampoo.</div>
+      <button type="button" class="btn-primary share-btn" id="openShare">
+        <span>Share my scorecard</span>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D7FF3A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
+      </button>
+    </div>
+    <button type="button" class="btn-outline" id="scanAnother">Scan another product</button>
+    <button type="button" class="btn-link" id="startOver" hidden>Start over</button>
+  </div>
+</div>
+</section>
+
+<!-- SHARE SHEET -->
+<div id="share" hidden>
+  <button type="button" class="scrim" data-close-share aria-label="Close share sheet"></button>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+    <div class="grab"></div>
+    <h2 id="shareTitle">Share your scorecard</h2>
+    <div class="preview">
+      <div class="n" id="prevNum">0</div>
+      <div><div class="t">My routine scorecard</div><div class="s" id="prevLine"></div></div>
+    </div>
+    <input class="link-box" id="linkBox" type="text" readonly aria-label="Scorecard link">
+    <div class="share-actions">
+      <button type="button" class="share-act" id="actCopy"><span class="circ" style="background:var(--lime)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span><span>Copy link</span></button>
+      <button type="button" class="share-act" id="actSave"><span class="circ" style="background:var(--pink)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></span><span>Save image</span></button>
+      <button type="button" class="share-act" id="actPin"><span class="circ" style="background:var(--orange)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6z"/><path d="M12 14v7"/></svg></span><span>Pinterest</span></button>
+      <button type="button" class="share-act" id="actMore"><span class="circ" style="background:var(--lilac)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></span><span>More</span></button>
+    </div>
+    <div class="toast" id="toast" role="status" hidden></div>
+    <button type="button" class="btn-primary done" data-close-share>Done</button>
+  </div>
+</div>
+
+</main>
+
+<!-- DESKTOP ONLY: hidden on phones and tablets -->
+<aside class="desk" aria-label="Open Ick Check on your phone">
+  <div class="mono-label">BEST ON YOUR PHONE</div>
+  <h2>Scan to open Ick Check on your phone</h2>
+  <div class="qr"><svg viewBox="0 0 25 25" role="img" aria-label="QR code that opens ickcheck.ai/app" shape-rendering="crispEdges"><path fill="#14110F" d="M0 0h1v1h-1zM1 0h1v1h-1zM2 0h1v1h-1zM3 0h1v1h-1zM4 0h1v1h-1zM5 0h1v1h-1zM6 0h1v1h-1zM10 0h1v1h-1zM11 0h1v1h-1zM12 0h1v1h-1zM14 0h1v1h-1zM15 0h1v1h-1zM18 0h1v1h-1zM19 0h1v1h-1zM20 0h1v1h-1zM21 0h1v1h-1zM22 0h1v1h-1zM23 0h1v1h-1zM24 0h1v1h-1zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM9 1h1v1h-1zM10 1h1v1h-1zM12 1h1v1h-1zM13 1h1v1h-1zM15 1h1v1h-1zM18 1h1v1h-1zM24 1h1v1h-1zM0 2h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM6 2h1v1h-1zM9 2h1v1h-1zM10 2h1v1h-1zM11 2h1v1h-1zM15 2h1v1h-1zM18 2h1v1h-1zM20 2h1v1h-1zM21 2h1v1h-1zM22 2h1v1h-1zM24 2h1v1h-1zM0 3h1v1h-1zM2 3h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM6 3h1v1h-1zM11 3h1v1h-1zM14 3h1v1h-1zM18 3h1v1h-1zM20 3h1v1h-1zM21 3h1v1h-1zM22 3h1v1h-1zM24 3h1v1h-1zM0 4h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM10 4h1v1h-1zM11 4h1v1h-1zM13 4h1v1h-1zM14 4h1v1h-1zM15 4h1v1h-1zM16 4h1v1h-1zM18 4h1v1h-1zM20 4h1v1h-1zM21 4h1v1h-1zM22 4h1v1h-1zM24 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM9 5h1v1h-1zM10 5h1v1h-1zM11 5h1v1h-1zM13 5h1v1h-1zM15 5h1v1h-1zM16 5h1v1h-1zM18 5h1v1h-1zM24 5h1v1h-1zM0 6h1v1h-1zM1 6h1v1h-1zM2 6h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM19 6h1v1h-1zM20 6h1v1h-1zM21 6h1v1h-1zM22 6h1v1h-1zM23 6h1v1h-1zM24 6h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM13 7h1v1h-1zM14 7h1v1h-1zM0 8h1v1h-1zM2 8h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM9 8h1v1h-1zM10 8h1v1h-1zM11 8h1v1h-1zM12 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM15 8h1v1h-1zM16 8h1v1h-1zM20 8h1v1h-1zM23 8h1v1h-1zM2 9h1v1h-1zM3 9h1v1h-1zM4 9h1v1h-1zM5 9h1v1h-1zM7 9h1v1h-1zM9 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM24 9h1v1h-1zM0 10h1v1h-1zM1 10h1v1h-1zM3 10h1v1h-1zM4 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM9 10h1v1h-1zM11 10h1v1h-1zM13 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM2 11h1v1h-1zM3 11h1v1h-1zM4 11h1v1h-1zM5 11h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM20 11h1v1h-1zM23 11h1v1h-1zM1 12h1v1h-1zM2 12h1v1h-1zM4 12h1v1h-1zM5 12h1v1h-1zM6 12h1v1h-1zM7 12h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM13 12h1v1h-1zM16 12h1v1h-1zM17 12h1v1h-1zM18 12h1v1h-1zM21 12h1v1h-1zM23 12h1v1h-1zM24 12h1v1h-1zM2 13h1v1h-1zM3 13h1v1h-1zM7 13h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM13 13h1v1h-1zM16 13h1v1h-1zM17 13h1v1h-1zM18 13h1v1h-1zM21 13h1v1h-1zM24 13h1v1h-1zM0 14h1v1h-1zM2 14h1v1h-1zM3 14h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM14 14h1v1h-1zM19 14h1v1h-1zM22 14h1v1h-1zM23 14h1v1h-1zM24 14h1v1h-1zM1 15h1v1h-1zM2 15h1v1h-1zM4 15h1v1h-1zM5 15h1v1h-1zM8 15h1v1h-1zM11 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM15 15h1v1h-1zM16 15h1v1h-1zM18 15h1v1h-1zM20 15h1v1h-1zM23 15h1v1h-1zM0 16h1v1h-1zM2 16h1v1h-1zM3 16h1v1h-1zM4 16h1v1h-1zM6 16h1v1h-1zM7 16h1v1h-1zM8 16h1v1h-1zM10 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1zM18 16h1v1h-1zM19 16h1v1h-1zM20 16h1v1h-1zM21 16h1v1h-1zM8 17h1v1h-1zM9 17h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM14 17h1v1h-1zM15 17h1v1h-1zM16 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM23 17h1v1h-1zM24 17h1v1h-1zM0 18h1v1h-1zM1 18h1v1h-1zM2 18h1v1h-1zM3 18h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM11 18h1v1h-1zM12 18h1v1h-1zM14 18h1v1h-1zM15 18h1v1h-1zM16 18h1v1h-1zM18 18h1v1h-1zM20 18h1v1h-1zM21 18h1v1h-1zM23 18h1v1h-1zM24 18h1v1h-1zM0 19h1v1h-1zM6 19h1v1h-1zM9 19h1v1h-1zM10 19h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM16 19h1v1h-1zM20 19h1v1h-1zM21 19h1v1h-1zM23 19h1v1h-1zM0 20h1v1h-1zM2 20h1v1h-1zM3 20h1v1h-1zM4 20h1v1h-1zM6 20h1v1h-1zM8 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM18 20h1v1h-1zM19 20h1v1h-1zM20 20h1v1h-1zM21 20h1v1h-1zM0 21h1v1h-1zM2 21h1v1h-1zM3 21h1v1h-1zM4 21h1v1h-1zM6 21h1v1h-1zM9 21h1v1h-1zM10 21h1v1h-1zM11 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM19 21h1v1h-1zM20 21h1v1h-1zM21 21h1v1h-1zM22 21h1v1h-1zM0 22h1v1h-1zM2 22h1v1h-1zM3 22h1v1h-1zM4 22h1v1h-1zM6 22h1v1h-1zM8 22h1v1h-1zM9 22h1v1h-1zM10 22h1v1h-1zM14 22h1v1h-1zM20 22h1v1h-1zM24 22h1v1h-1zM0 23h1v1h-1zM6 23h1v1h-1zM10 23h1v1h-1zM12 23h1v1h-1zM13 23h1v1h-1zM15 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM20 23h1v1h-1zM21 23h1v1h-1zM23 23h1v1h-1zM0 24h1v1h-1zM1 24h1v1h-1zM2 24h1v1h-1zM3 24h1v1h-1zM4 24h1v1h-1zM5 24h1v1h-1zM6 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM11 24h1v1h-1zM12 24h1v1h-1zM13 24h1v1h-1zM14 24h1v1h-1zM15 24h1v1h-1zM16 24h1v1h-1zM17 24h1v1h-1zM19 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1z"/></svg></div>
+  <p>Point your iPhone or Android camera at the code. It opens in your browser, no download&nbsp;needed.</p>
+  <div class="desk-link"><span class="desk-url">ickcheck.ai/app</span><button type="button" class="desk-copy" id="deskCopy">Copy link</button><span class="desk-msg" id="deskMsg" role="status"></span></div>
+  <div class="mono-label" style="margin-top:6px">APPS</div>
+  <div class="store-row"><span class="store"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18h2"/></svg>iPhone app <small>SOON</small></span><span class="store"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18h2"/></svg>Android app <small>SOON</small></span></div>
+</aside>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Sample data. Replace with a real ingredient list before launch. ---------- */
+  var CATALOG = [
+    { name: 'Daily moisturizer', clear: ['Water', 'Glycerin', 'Shea butter'], more: 20, flags: [{ ing: 'Propylparaben', src: 'EU endocrine disruptor list' }] },
+    { name: 'Sunscreen SPF 30', clear: ['Water', 'Zinc oxide', 'Aloe'], more: 18, flags: [{ ing: 'Oxybenzone', src: 'EU endocrine disruptor list' }] },
+    { name: 'Shampoo', clear: ['Water', 'Coco-glucoside', 'Glycerin'], more: 15, flags: [] },
+    { name: 'Body wash', clear: ['Water', 'Glycerin'], more: 22, flags: [{ ing: 'Undisclosed fragrance blend', src: 'Undisclosed ingredients' }, { ing: 'Triclosan', src: 'EU endocrine disruptor list' }] }
+  ];
+  var RULES = [
+    { k: 'propylparaben', ing: 'Propylparaben', src: 'EU endocrine disruptor list' },
+    { k: 'oxybenzone', ing: 'Oxybenzone', src: 'EU endocrine disruptor list' },
+    { k: 'triclosan', ing: 'Triclosan', src: 'EU endocrine disruptor list' },
+    { k: 'fragrance', ing: 'Fragrance', src: 'Undisclosed ingredients' },
+    { k: 'parfum', ing: 'Fragrance', src: 'Undisclosed ingredients' }
+  ];
+  var EXAMPLE = 'Aqua, Glycerin, Propylparaben, Cetearyl Alcohol, Shea Butter, Parfum, Tocopherol';
+  var NB = ' ';
+  var STORE_KEY = 'ickcheck.scorecard.v1';
+
+  var state = { screen: 'home', mode: 'scan', found: null, items: [], scanCount: 0, shared: false };
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- helpers ---------- */
+  function nb(str) { var i = str.lastIndexOf(' '); return i < 0 ? str : str.slice(0, i) + NB + str.slice(i + 1); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function tokenize(t) { return (t || '').split(/[,;\n]+/).map(function (s) { return s.trim(); }).filter(Boolean); }
+  function flagText(flags) {
+    if (!flags.length) return 'No flags found in our lists';
+    return flags.map(function (f) { return f.ing + ', ' + f.src; }).join('; ');
+  }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function totals() {
+    var items = state.items;
+    var total = items.reduce(function (a, i) { return a + i.flags.length; }, 0);
+    var flagged = items.filter(function (i) { return i.flags.length > 0; }).length;
+    return { total: total, flagged: flagged, clean: items.length - flagged, summary: plural(total, 'flag') + ' across ' + nb(plural(items.length, 'product')) };
+  }
+
+  /* ---------- saving and share links ---------- */
+  function save() {
+    if (state.shared) return;
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state.items)); } catch (e) {}
+  }
+  function load() {
+    try { var v = JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); if (Array.isArray(v)) return clean(v); } catch (e) {}
+    return [];
+  }
+  function clean(list) {
+    return list.slice(0, 20).map(function (i) {
+      return {
+        name: String(i && i.name || 'Product').slice(0, 60),
+        flags: (i && Array.isArray(i.flags) ? i.flags : []).slice(0, 10).map(function (f) { return { ing: String(f.ing || '').slice(0, 60), src: String(f.src || '').slice(0, 60) }; })
+      };
+    });
+  }
+  function baseUrl() { return location.href.split('#')[0]; }
+  function shareUrl() {
+    var compact = state.items.map(function (i) { return [i.name, i.flags.map(function (f) { return [f.ing, f.src]; })]; });
+    return baseUrl() + '#s=' + encodeURIComponent(JSON.stringify(compact));
+  }
+  function readSharedHash() {
+    var m = location.hash.match(/^#s=(.+)$/);
+    if (!m) return null;
+    try {
+      var data = JSON.parse(decodeURIComponent(m[1]));
+      if (!Array.isArray(data)) return null;
+      return clean(data.map(function (r) { return { name: r[0], flags: (r[1] || []).map(function (f) { return { ing: f[0], src: f[1] }; }) }; }));
+    } catch (e) { return null; }
+  }
+
+  /* ---------- results ---------- */
+  function buildFound(name, badge, flags, others, more, checked) {
+    var chips = flags.map(function (f) { return { text: f.ing, flag: true }; })
+      .concat(others.map(function (t) { return { text: t, flag: false }; }));
+    if (more > 0) chips.push({ text: '+' + more + ' more', flag: false });
+    var note = flags.length ? plural(flags.length, 'flag') + '. ' + flagText(flags) + '.' : 'No flags found in our lists.';
+    return { name: name, badge: badge, flags: flags, chips: chips, count: checked + ' ingredients', note: nb(note) };
+  }
+
+  /* ---------- render ---------- */
+  function render() {
+    ['home', 'scanner', 'scorecard'].forEach(function (s) { $(s).hidden = state.screen !== s; });
+    var items = state.items, t = totals();
+
+    $('teaserEmpty').hidden = items.length > 0;
+    $('teaserFilled').hidden = items.length === 0;
+    $('teaserLine').textContent = t.summary;
+    $('teaserNum').textContent = t.total;
+
+    var scan = state.mode === 'scan', found = state.found;
+    $('tabScan').setAttribute('aria-pressed', String(scan));
+    $('tabPaste').setAttribute('aria-pressed', String(!scan));
+    $('camTall').hidden = !(scan && !found);
+    $('camShort').hidden = !(scan && found);
+    $('pasteForm').hidden = !(!scan && !found);
+    $('drawer').hidden = !found;
+    $('pasteCount').textContent = plural(tokenize($('pasteText').value).length, 'ingredient');
+    if (found) {
+      $('foundBadge').textContent = found.badge;
+      $('foundName').textContent = found.name;
+      $('foundCount').textContent = found.count;
+      var chips = $('foundChips'); chips.textContent = '';
+      found.chips.forEach(function (c) { chips.appendChild(el('div', 'chip' + (c.flag ? ' flag' : ''), c.text)); });
+      var note = $('foundNote'); note.textContent = found.note;
+      note.className = 'note ' + (found.flags.length ? 'flag' : 'clear');
+      $('againBtn').textContent = scan ? 'Scan again' : 'Edit ingredients';
+    }
+
+    $('sharedChip').hidden = !state.shared;
+    $('cardFilled').hidden = items.length === 0;
+    $('cardEmpty').hidden = items.length > 0;
+    $('shareGroup').hidden = items.length === 0 || state.shared;
+    $('startOver').hidden = items.length === 0 || state.shared;
+    $('scanAnother').textContent = state.shared ? 'Check your own routine' : 'Scan another product';
+    $('byLine').textContent = 'Scanned ' + plural(items.length, 'product');
+    $('totalNum').textContent = t.total;
+    $('flagsWord').textContent = t.total === 1 ? 'flag found' : 'flags found';
+    $('splitLine').textContent = t.flagged + ' flagged, ' + t.clean + ' clean on our' + NB + 'lists';
+    var rows = $('rows'); rows.textContent = '';
+    items.forEach(function (i) {
+      var row = el('div', 'row'), left = el('div');
+      left.appendChild(el('div', 'name', i.name));
+      left.appendChild(el('div', 'detail', nb(flagText(i.flags))));
+      row.appendChild(left);
+      row.appendChild(el('div', 'pill ' + (i.flags.length ? 'flag' : 'clear'), plural(i.flags.length, 'flag')));
+      rows.appendChild(row);
+    });
+    $('prevNum').textContent = t.total;
+    $('prevLine').textContent = t.summary;
+  }
+
+  function go(where) {
+    $('share').hidden = true;
+    if (where === 'home' || where === 'scorecard') { state.screen = where; state.found = null; }
+    else { state.screen = 'scanner'; state.mode = where; state.found = null; $('pasteErr').hidden = true; }
+    render();
+    var s = $(state.screen); if (s) s.scrollTop = 0;
+  }
+  function leaveShared() {
+    if (!state.shared) return;
+    state.shared = false; state.items = load();
+    try { history.replaceState(null, '', baseUrl()); } catch (e) {}
+  }
+
+  /* ---------- scorecard image (1000 x 1500, Pinterest's preferred 2:3 shape) ---------- */
+  function rr(x, c, y, w, h, r) { x.beginPath(); x.moveTo(c + r, y); x.arcTo(c + w, y, c + w, y + h, r); x.arcTo(c + w, y + h, c, y + h, r); x.arcTo(c, y + h, c, y, r); x.arcTo(c, y, c + w, y, r); x.closePath(); }
+  function fit(x, text, max) {
+    if (x.measureText(text).width <= max) return text;
+    while (text.length > 1 && x.measureText(text + '…').width > max) text = text.slice(0, -1);
+    return text + '…';
+  }
+  function makeImage() {
+    var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    return ready.then(function () {
+      var W = 1000, H = 1500, cv = document.createElement('canvas');
+      cv.width = W; cv.height = H;
+      var x = cv.getContext('2d'), t = totals(), D = "'Bricolage Grotesque', system-ui, sans-serif", M = "'Space Mono', monospace";
+      x.fillStyle = '#D7FF3A'; x.fillRect(0, 0, W, H);
+      x.fillStyle = '#14110F'; x.font = '800 60px ' + D; x.textBaseline = 'alphabetic'; x.fillText('ick check', 70, 125);
+      x.fillStyle = '#B9A6FF'; rr(x, 74, 184, 880, 1110, 48); x.fill();
+      x.fillStyle = '#14110F'; rr(x, 60, 170, 880, 1110, 48); x.fill();
+      x.fillStyle = '#FFF6E6'; x.font = '800 86px ' + D; x.fillText('My routine', 110, 300); x.fillText('scorecard', 110, 390);
+      x.fillStyle = '#CFC6B6'; x.font = '600 34px ' + D; x.fillText('Scanned ' + plural(state.items.length, 'product'), 110, 450);
+      x.fillStyle = '#2A2420'; rr(x, 110, 495, 780, 230, 36); x.fill();
+      x.fillStyle = '#D7FF3A'; x.font = '800 210px ' + D; x.fillText(String(t.total), 145, 690);
+      var tx = 160 + x.measureText(String(t.total)).width + 30;
+      x.save(); x.translate(tx, 560); x.rotate(-0.05);
+      x.font = '800 44px ' + D; var tag = t.total === 1 ? 'flag found' : 'flags found', tw = x.measureText(tag).width;
+      x.fillStyle = '#FF9AD0'; rr(x, 0, 0, tw + 36, 66, 14); x.fill();
+      x.fillStyle = '#14110F'; x.fillText(tag, 18, 48); x.restore();
+      x.fillStyle = '#E8E0D2'; x.font = '600 30px ' + D;
+      x.fillText(fit(x, t.flagged + ' flagged, ' + t.clean + ' clean on our lists', 880 - tx), tx, 680);
+      var y = 800, shown = state.items.slice(0, 5);
+      shown.forEach(function (i) {
+        var pill = plural(i.flags.length, 'flag');
+        x.font = '800 30px ' + D; var pw = x.measureText(pill).width + 36;
+        x.fillStyle = i.flags.length ? '#FF6A3D' : '#D7FF3A'; rr(x, 890 - pw, y - 34, pw, 48, 24); x.fill();
+        x.fillStyle = '#14110F'; x.fillText(pill, 890 - pw + 18, y);
+        x.fillStyle = '#FFF6E6'; x.font = '800 40px ' + D; x.fillText(fit(x, i.name, 760 - pw - 120), 110, y + 4);
+        x.fillStyle = '#CFC6B6'; x.font = '500 28px ' + D; x.fillText(fit(x, flagText(i.flags), 780), 110, y + 46);
+        y += 102;
+      });
+      if (state.items.length > shown.length) { x.fillStyle = '#CFC6B6'; x.font = '600 28px ' + D; x.fillText('+' + (state.items.length - shown.length) + ' more products', 110, y + 4); }
+      x.strokeStyle = '#5A5046'; x.lineWidth = 3; x.setLineDash([12, 10]); x.beginPath(); x.moveTo(110, 1195); x.lineTo(890, 1195); x.stroke(); x.setLineDash([]);
+      x.fillStyle = '#CFC6B6'; x.font = '500 26px ' + D;
+      x.fillText(fit(x, 'Flags come from public lists.', 780), 110, 1238);
+      x.fillText(fit(x, 'Not a safety verdict or medical advice.', 780), 110, 1272);
+      x.fillStyle = '#14110F'; x.font = '800 46px ' + D; x.fillText('Is your routine actually clean?', 70, 1385);
+      x.font = '700 28px ' + M; x.fillText(fit(x, baseUrl().replace(/^https?:\/\//, ''), 860), 70, 1435);
+      return new Promise(function (res) { cv.toBlob(function (b) { res(b); }, 'image/png'); });
+    });
+  }
+
+  /* ---------- share actions ---------- */
+  function toast(msg) { var t = $('toast'); t.textContent = msg; t.hidden = false; }
+  function shareText() { var t = totals(); return 'My routine scorecard on Ick Check: ' + t.summary.replace(/ /g, ' ') + '. Is yours actually clean?'; }
+
+  $('actCopy').addEventListener('click', function () {
+    var url = shareUrl(), box = $('linkBox');
+    var fallback = function () { box.focus(); box.select(); toast('LINK SELECTED. COPY IT.'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { toast('LINK COPIED'); }, fallback);
+    else fallback();
+  });
+
+  $('actSave').addEventListener('click', function () {
+    makeImage().then(function (blob) {
+      if (!blob) throw new Error('no image');
+      var a = document.createElement('a'), u = URL.createObjectURL(blob);
+      a.href = u; a.download = 'ickcheck-scorecard.png'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+      toast('IMAGE SAVED');
+    }).catch(function () { toast('COULD NOT SAVE HERE. TRY ON THE LIVE SITE.'); });
+  });
+
+  $('actPin').addEventListener('click', function () {
+    var media = new URL('images/pin-image.png', baseUrl()).href;
+    var pin = 'https://www.pinterest.com/pin/create/button/?url=' + encodeURIComponent(baseUrl()) +
+      '&media=' + encodeURIComponent(media) + '&description=' + encodeURIComponent(shareText());
+    var w = window.open(pin, '_blank', 'noopener');
+    if (!w) location.href = pin;
+    toast('OPENING PINTEREST');
+  });
+
+  $('actMore').addEventListener('click', function () {
+    if (!navigator.share) { toast('SHARING ISN’T AVAILABLE IN THIS BROWSER'); return; }
+    makeImage().then(function (blob) {
+      var data = { title: 'My scorecard on Ick Check', text: shareText(), url: shareUrl() };
+      if (blob && typeof File === 'function') {
+        var file = new File([blob], 'ickcheck-scorecard.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) data.files = [file];
+      }
+      return navigator.share(data);
+    }).catch(function (e) { if (!e || e.name !== 'AbortError') toast('SHARING DIDN’T WORK HERE'); });
+  });
+
+  /* ---------- events ---------- */
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button'); if (!t) return;
+    if (t.dataset.go) { if (t.dataset.go !== 'scorecard') leaveShared(); return go(t.dataset.go); }
+    if (t.dataset.mode) { state.mode = t.dataset.mode; state.found = null; $('pasteErr').hidden = true; return render(); }
+    if (t.hasAttribute('data-close-share')) { $('share').hidden = true; return; }
+  });
+
+  $('tapScan').addEventListener('click', function () {
+    var p = CATALOG[state.scanCount % CATALOG.length];
+    state.found = buildFound(p.name, 'FOUND IT', p.flags, p.clear, p.more, p.flags.length + p.clear.length + p.more);
+    state.scanCount++;
+    render();
+  });
+
+  $('pasteText').addEventListener('input', function () { $('pasteErr').hidden = true; render(); });
+  $('tryExample').addEventListener('click', function () { $('pasteText').value = EXAMPLE; $('pasteErr').hidden = true; render(); });
+
+  $('pasteForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var tokens = tokenize($('pasteText').value);
+    if (!tokens.length) { $('pasteErr').hidden = false; return; }
+    var flags = [], others = [];
+    tokens.forEach(function (t) {
+      var low = t.toLowerCase();
+      var rule = RULES.filter(function (r) { return low.indexOf(r.k) >= 0; })[0];
+      if (rule) { if (!flags.some(function (f) { return f.ing === rule.ing; })) flags.push({ ing: rule.ing, src: rule.src }); }
+      else others.push(t.charAt(0).toUpperCase() + t.slice(1));
+    });
+    var shown = others.slice(0, 3);
+    var name = $('pasteName').value.trim() || 'Pasted product';
+    state.found = buildFound(name, 'CHECKED', flags, shown, others.length - shown.length, tokens.length);
+    render();
+  });
+
+  $('againBtn').addEventListener('click', function () { state.found = null; render(); });
+
+  $('addBtn').addEventListener('click', function () {
+    var f = state.found; if (!f) return;
+    state.items.push({ name: f.name.slice(0, 60), flags: f.flags });
+    save();
+    $('pasteText').value = ''; $('pasteName').value = '';
+    go('scorecard');
+  });
+
+  $('scanAnother').addEventListener('click', function () { leaveShared(); go('scan'); });
+  $('openShare').addEventListener('click', function () { $('toast').hidden = true; $('linkBox').value = shareUrl(); $('share').hidden = false; });
+  $('startOver').addEventListener('click', function () { state.items = []; state.scanCount = 0; save(); render(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') $('share').hidden = true; });
+
+  /* ---------- desktop panel: copy link ---------- */
+  var deskCopy = $('deskCopy');
+  if (deskCopy) deskCopy.addEventListener('click', function () {
+    var u = baseUrl(), m = $('deskMsg');
+    var done = function () { m.textContent = 'LINK COPIED'; }, fail = function () { m.textContent = u; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(u).then(done, fail); else fail();
+  });
+
+  /* ---------- start ---------- */
+  var shared = readSharedHash();
+  if (shared && shared.length) { state.items = shared; state.shared = true; state.screen = 'scorecard'; }
+  else state.items = load();
+  render();
+})();
+</script>
+</body>
+</html>
