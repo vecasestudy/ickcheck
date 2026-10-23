@@ -77,6 +77,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .btn-link{min-height:44px;border:none;background:transparent;font-weight:600;font-size:15px;text-decoration:underline}
 .chip{border:2px solid var(--ink);border-radius:999px;padding:5px 12px;font-weight:600;font-size:14px}
 .chip.flag{background:var(--orange);font-weight:800}
+.chip.flag-soft{background:var(--lilac);border-style:dashed;font-weight:800}
+.note.soft{background:#EEE8FF}
+.pill.flag-soft{background:var(--lilac)}
 .pill{flex-shrink:0;font-weight:800;font-size:13px;border-radius:999px;padding:4px 11px;color:var(--ink);white-space:nowrap}
 .pill.flag{background:var(--orange)}
 .pill.clear{background:var(--lime)}
@@ -527,7 +530,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
   });
   function findFlags(text) {
     var n = norm(text), out = [];
-    MATCHERS.forEach(function (m) { if (m.re.test(n)) out.push({ ing: m.f.name, src: (LISTS[m.best] || {}).label || 'EU ED list', list: m.best }); });
+    MATCHERS.forEach(function (m) { if (m.re.test(n)) out.push({ ing: m.f.name, src: ((LISTS[m.best] || {}).label || 'EU ED list') + (m.best === 'III' ? ' (lower tier)' : ''), list: m.best }); });
     return out.sort(function (x, y) { return ORDER.indexOf(x.list) - ORDER.indexOf(y.list); });
   }
   function isFlagged(token) { var n = norm(token); return MATCHERS.some(function (m) { return m.re.test(n); }); }
@@ -543,13 +546,17 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
 
   /* ---------- results ---------- */
   function buildFound(name, badge, flags, others, more, checked) {
-    var chips = flags.map(function (f) { return { text: f.ing, flag: true }; })
+    var chips = flags.map(function (f) { return { text: f.ing, flag: true, soft: f.list === 'III' }; })
       .concat(others.map(function (t) { return { text: t, flag: false }; }));
     if (more > 0) chips.push({ text: '+' + more + ' more', flag: false });
-    var note = flags.length
-      ? flags.map(function (f) { var l = LISTS[f.list] || {}; return f.ing + ': ' + (l.label || f.src) + (l.desc ? ', ' + l.desc.charAt(0).toLowerCase() + l.desc.slice(1) : '') + '.'; }).join('\n')
-      : nb('No flags found on the EU endocrine disruptor lists.');
-    return { name: name, badge: badge, flags: flags, chips: chips, count: checked + ' ingredients', note: note };
+    var strong = flags.filter(function (f) { return f.list !== 'III'; }), soft = flags.filter(function (f) { return f.list === 'III'; });
+    var lines = strong.map(function (f) { var l = LISTS[f.list] || {}; return f.ing + ': ' + (l.label || f.src) + (l.desc ? ', ' + l.desc.charAt(0).toLowerCase() + l.desc.slice(1) : '') + '.'; });
+    if (soft.length) {
+      lines.push((lines.length ? '\n' : '') + 'Lower tier: ' + soft.map(function (f) { return f.ing; }).join(', ') + ' (EU ED List III).');
+      lines.push(nb('One national authority considers ' + (soft.length === 1 ? 'it' : 'these') + ' an endocrine disruptor. ' + (soft.length === 1 ? 'It has' : 'They have') + ' not been identified at EU level.'));
+    }
+    var note = flags.length ? lines.join('\n') : nb('No flags found on the EU endocrine disruptor lists.');
+    return { name: name, badge: badge, flags: flags, chips: chips, count: checked + ' ingredients', note: note, softOnly: flags.length > 0 && !strong.length };
   }
 
   /* ---------- render ---------- */
@@ -582,9 +589,9 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       $('foundName').textContent = found.name;
       $('foundCount').textContent = found.count;
       var chips = $('foundChips'); chips.textContent = '';
-      found.chips.forEach(function (c) { chips.appendChild(el('div', 'chip' + (c.flag ? ' flag' : ''), c.text)); });
+      found.chips.forEach(function (c) { chips.appendChild(el('div', 'chip' + (c.flag ? (c.soft ? ' flag-soft' : ' flag') : ''), c.text)); });
       var note = $('foundNote'); note.textContent = found.note;
-      note.className = 'note ' + (found.flags.length ? 'flag' : 'clear');
+      note.className = 'note ' + (found.softOnly ? 'soft' : found.flags.length ? 'flag' : 'clear');
       $('againBtn').textContent = scan ? 'Scan again' : 'Edit ingredients';
       $('editBtn').hidden = !(found.origin && found.origin.kind === 'obf');
       var src = $('foundSrc'); src.textContent = '';
@@ -616,7 +623,8 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       left.appendChild(el('div', 'name', i.name));
       left.appendChild(el('div', 'detail', nb(flagText(i.flags))));
       row.appendChild(left);
-      row.appendChild(el('div', 'pill ' + (i.flags.length ? 'flag' : 'clear'), plural(i.flags.length, 'flag')));
+      var allSoft = i.flags.length && i.flags.every(function (f) { return /lower tier/.test(f.src); });
+      row.appendChild(el('div', 'pill ' + (!i.flags.length ? 'clear' : allSoft ? 'flag-soft' : 'flag'), plural(i.flags.length, 'flag')));
       rows.appendChild(row);
     });
     $('prevNum').textContent = t.total;
