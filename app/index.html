@@ -119,6 +119,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 #scanner .wrap{min-height:100%;display:flex;flex-direction:column}
 .scan-head{padding:calc(22px + var(--safe-top)) var(--gutter) 0;display:flex;flex-direction:column;gap:16px}
 .tabs{display:flex;gap:8px}
+.tabs .tab{flex:1 1 auto}
 .tab{flex:1;min-height:44px;border:2px solid var(--cream);background:transparent;color:var(--cream);border-radius:999px;font-weight:600;font-size:15px;padding:0 8px}
 .tab[aria-pressed="true"]{border-color:var(--lime);background:var(--lime);color:var(--ink);font-weight:800}
 .cam{margin:18px var(--gutter) 0;position:relative;border-radius:28px;background:var(--ink-2);overflow:hidden}
@@ -221,6 +222,16 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
 .paste-meta .btns{display:flex;gap:8px;flex-wrap:nowrap;margin-left:auto}
 .btn-link.on-cream{color:var(--ink);align-self:center}
 
+/* Search and in-app browser notice */
+.search{padding:22px var(--gutter) calc(24px + var(--safe-bottom));display:flex;flex-direction:column;gap:14px}
+.results{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.result{width:100%;text-align:left;border:2px solid #4A433B;border-radius:16px;background:var(--ink-2);color:var(--cream);padding:12px 14px;display:flex;flex-direction:column;gap:3px;min-height:56px}
+.result:hover{border-color:var(--lime)}
+.result b{font-weight:800;font-size:16px;line-height:1.25}
+.result span{font-family:var(--mono);font-size:11.5px;color:var(--muted-dark)}
+.inapp{margin:14px var(--gutter) 0;border:2px solid var(--pink);border-radius:16px;padding:12px 14px;font-size:14.5px;line-height:1.4;color:var(--cream)}
+.inapp b{color:var(--pink)}
+
 /* Desktop: a side panel that sends people to their phone */
 .desk{display:none}
 @media (min-width:900px) and (hover:hover) and (pointer:fine){
@@ -297,8 +308,11 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     <div class="tabs" role="group" aria-label="Input method">
       <button type="button" class="tab" id="tabScan" data-mode="scan" aria-pressed="true">Scan barcode</button>
       <button type="button" class="tab" id="tabPaste" data-mode="paste" aria-pressed="false">Paste ingredients</button>
+      <button type="button" class="tab" id="tabSearch" data-mode="search" aria-pressed="false">Search</button>
     </div>
   </div>
+
+  <div class="inapp" id="inAppNote" role="note" hidden></div>
 
   <div class="cam tall" id="camTall">
     <video id="camVideo" playsinline muted autoplay hidden></video>
@@ -352,6 +366,20 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       <span>Check ingredients</span>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
     </button>
+  </form>
+
+  <form class="search" id="searchForm" hidden novalidate>
+    <div class="field">
+      <label class="mono-label" for="searchInput">SEARCH BY PRODUCT NAME</label>
+      <input class="input" id="searchInput" type="search" placeholder="CeraVe Moisturizing Cream" autocomplete="off" maxlength="80" enterkeyhint="search">
+    </div>
+    <button type="submit" class="btn-primary btn-lime">
+      <span>Search</span>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    </button>
+    <div class="ocr-status" id="searchMsg" role="status" hidden></div>
+    <ul class="results" id="searchResults" aria-label="Search results"></ul>
+    <p class="src" style="color:var(--muted-dark)">Results from <a href="https://world.openbeautyfacts.org" target="_blank" rel="noopener">Open Beauty Facts</a>, an open database (ODbL). Only products with an ingredient list are shown.</p>
   </form>
 
   <div class="drawer" id="drawer" hidden>
@@ -569,9 +597,12 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     $('teaserLine').textContent = t.summary;
     $('teaserNum').textContent = t.total;
 
-    var scan = state.mode === 'scan', found = state.found;
+    var scan = state.mode === 'scan', paste = state.mode === 'paste', search = state.mode === 'search', found = state.found;
     $('tabScan').setAttribute('aria-pressed', String(scan));
-    $('tabPaste').setAttribute('aria-pressed', String(!scan));
+    $('tabPaste').setAttribute('aria-pressed', String(paste));
+    $('tabSearch').setAttribute('aria-pressed', String(search));
+    var ia = $('inAppNote');
+    if (IN_APP && !found && !search) { ia.textContent = ''; var bb = el('b', null, 'Camera blocked? '); ia.appendChild(bb); ia.appendChild(document.createTextNode('You opened this inside ' + IN_APP + ', which can block the camera and photos. Tap ••• and choose Open in Safari (or Open in browser). Search works here.')); ia.hidden = false; } else ia.hidden = true;
     var scanning = state.screen === 'scanner' && scan && !found;
     if (!scanning) stopCamera();
     $('camTall').hidden = !(scan && !found);
@@ -581,7 +612,8 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     $('tapScan').hidden = cam.live || cam.busy;
     $('camLabel').textContent = cam.label;
     $('camShort').hidden = !(scan && found);
-    $('pasteForm').hidden = !(!scan && !found);
+    $('pasteForm').hidden = !(paste && !found);
+    $('searchForm').hidden = !(search && !found);
     $('drawer').hidden = !found;
     $('pasteCount').textContent = plural(tokenize($('pasteText').value).length, 'ingredient');
     if (found) {
@@ -592,7 +624,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       found.chips.forEach(function (c) { chips.appendChild(el('div', 'chip' + (c.flag ? (c.soft ? ' flag-soft' : ' flag') : ''), c.text)); });
       var note = $('foundNote'); note.textContent = found.note;
       note.className = 'note ' + (found.softOnly ? 'soft' : found.flags.length ? 'flag' : 'clear');
-      $('againBtn').textContent = scan ? 'Scan again' : 'Edit ingredients';
+      $('againBtn').textContent = scan ? 'Scan again' : search ? 'Search again' : 'Edit ingredients';
       $('editBtn').hidden = !(found.origin && found.origin.kind === 'obf');
       var src = $('foundSrc'); src.textContent = '';
       if (found.origin && found.origin.kind === 'obf') {
@@ -774,6 +806,12 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
 
   /* ---------- real scanner: camera, barcode photo, typed number ---------- */
   var cam = { stream: null, live: false, busy: false, timer: null, label: 'POINT AT THE BARCODE' };
+  var IN_APP = (function (ua) {
+    var apps = [['LinkedInApp', 'LinkedIn'], ['Instagram', 'Instagram'], ['FBAN', 'Facebook'], ['FBAV', 'Facebook'], ['TikTok', 'TikTok'], ['musical_ly', 'TikTok'], ['Snapchat', 'Snapchat'], ['Pinterest', 'Pinterest'], ['Twitter', 'X'], ['Line/', 'LINE']];
+    for (var i = 0; i < apps.length; i++) if (ua.indexOf(apps[i][0]) >= 0) return apps[i][1] + '’s browser';
+    return '';
+  })(navigator.userAgent || '');
+  function withTimeout(pr, ms) { return Promise.race([pr, new Promise(function (_, rej) { setTimeout(function () { var e = new Error('timeout'); e.name = 'TimeoutError'; rej(e); }, ms); })]); }
   var FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'];
   var detectorPromise = null;
   function abs(path) { return new URL(path, location.href).href; }
@@ -807,11 +845,11 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
   }
   async function startCamera() {
     showScanErr('');
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showScanErr('The camera isn’t available in this browser. Use Photo of the barcode, or type the number.'); return; }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showScanErr(IN_APP ? 'The camera is blocked in ' + IN_APP + '. Open this page in Safari to scan, or use Search.' : 'The camera isn’t available in this browser. Use Photo of the barcode, type the number, or use Search.'); return; }
     cam.busy = true; cam.label = 'STARTING CAMERA'; render();
     try {
-      var detector = await getDetector();
-      var stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+      var detector = await withTimeout(getDetector(), 12000);
+      var stream = await withTimeout(navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }), 15000);
       if (state.screen !== 'scanner' || state.mode !== 'scan' || state.found) { stream.getTracks().forEach(function (t) { t.stop(); }); cam.busy = false; return; }
       cam.stream = stream;
       var v = $('camVideo'); v.srcObject = stream;
@@ -828,7 +866,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       tick();
     } catch (e) {
       cam.busy = false; stopCamera(); cam.label = 'POINT AT THE BARCODE';
-      showScanErr(e && e.name === 'NotAllowedError' ? 'Camera access was blocked. Allow it in your browser settings, or use Photo of the barcode.' : 'The camera didn’t start. Use Photo of the barcode, or type the number.');
+      showScanErr(e && e.name === 'NotAllowedError' ? 'Camera access was blocked. Allow it for this site in Settings, Safari, Camera, or use Photo of the barcode.' : IN_APP ? 'The camera didn’t start in ' + IN_APP + '. Open this page in Safari to scan, or use Search.' : 'The camera didn’t start. Use Photo of the barcode, type the number, or use Search.');
       render();
     }
   }
@@ -892,6 +930,41 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     $('pasteText').value = f.text || ''; $('pasteName').value = f.name.slice(0, 60);
     $('pasteNotice').hidden = true; render();
   });
+
+  /* ---------- search by product name (Open Beauty Facts) ---------- */
+  function searchMsg(m) { var e = $('searchMsg'); e.textContent = m || ''; e.hidden = !m; }
+  async function searchProducts(q) {
+    var list = $('searchResults'); list.textContent = '';
+    q = String(q || '').trim();
+    if (q.length < 3) { searchMsg('Type at least 3 letters of the product name.'); return; }
+    searchMsg('Searching…');
+    var ctrl = new AbortController(), t = setTimeout(function () { ctrl.abort(); }, 12000);
+    try {
+      var r = await fetch('https://world.openbeautyfacts.org/cgi/search.pl?search_terms=' + encodeURIComponent(q) + '&search_simple=1&action=process&json=1&page_size=24&fields=code,product_name,product_name_en,brands,ingredients_text_en,ingredients_text', { signal: ctrl.signal });
+      var j = await r.json();
+      var seen = {}, rows = (j.products || []).filter(function (p) {
+        var ing = String(p.ingredients_text_en || p.ingredients_text || '').trim();
+        var nm = [String(p.brands || '').split(',')[0].trim(), p.product_name_en || p.product_name || ''].filter(Boolean).join(' ').trim();
+        if (ing.length < 10 || !nm || seen[nm.toLowerCase()]) return false;
+        seen[nm.toLowerCase()] = 1; p._name = nm; p._ing = ing; return true;
+      }).slice(0, 8);
+      if (!rows.length) { searchMsg('No matches with an ingredient list. Try fewer words (brand and product type), or scan or paste instead.'); return; }
+      searchMsg('');
+      rows.forEach(function (p) {
+        var li = el('li'), b = el('button', 'result'); b.type = 'button';
+        b.appendChild(el('b', null, p._name.slice(0, 90)));
+        b.appendChild(el('span', null, plural(tokenize(p._ing).length, 'ingredient') + (p.code ? ' · ' + p.code : '')));
+        b.addEventListener('click', function () {
+          state.found = analyze(p._ing, p._name.slice(0, 60), 'FOUND IT', { kind: 'obf', code: p.code, url: 'https://world.openbeautyfacts.org/product/' + p.code });
+          render(); var sc = $('scanner'); if (sc) sc.scrollTop = 0;
+        });
+        li.appendChild(b); list.appendChild(li);
+      });
+    } catch (e) {
+      searchMsg('The product database didn’t answer. Check your connection and try again.');
+    } finally { clearTimeout(t); }
+  }
+  $('searchForm').addEventListener('submit', function (e) { e.preventDefault(); var i = $('searchInput'); i.blur(); searchProducts(i.value); });
 
   /* ---------- label photo reading (runs on the phone; the photo is not uploaded) ---------- */
   var ocrWorker = null;
