@@ -196,6 +196,28 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
 .toast{align-self:center;background:var(--lime);border:2px solid var(--ink);border-radius:999px;padding:6px 16px;font-family:var(--mono);font-size:12px;font-weight:700;text-align:center}
 .done{justify-content:center;font-size:17px;min-height:52px}
 
+/* Real scanner, lookups and label reading */
+.cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cam.tall{margin-bottom:14px}
+.cam-label{padding:0 16px}
+.scan-alt{padding:0 var(--gutter) calc(24px + var(--safe-bottom));display:flex;flex-direction:column;gap:12px}
+.alt-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.alt-row .input{flex:1 1 160px;min-width:0;min-height:48px;padding:0 14px;font-family:var(--mono);font-size:16px}
+.ghost-pill{display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.src{font-size:12.5px;line-height:1.45}
+.src a{color:inherit;text-decoration:underline}
+.scan-alt .src{color:var(--muted-dark)}
+.drawer .src{color:var(--muted-light)}
+.notice{border:2px solid var(--lime);border-radius:16px;padding:12px 14px;font-size:15px;line-height:1.4;color:var(--cream)}
+.ocr-status{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--lime);line-height:1.5}
+.note{white-space:pre-line}
+.paste-meta{flex-wrap:wrap}
+.paste-meta .count{white-space:nowrap}
+.paste-meta .btns{display:flex;gap:8px;flex-wrap:nowrap;margin-left:auto}
+.btn-link.on-cream{color:var(--ink);align-self:center}
+
 /* Desktop: a side panel that sends people to their phone */
 .desk{display:none}
 @media (min-width:900px) and (hover:hover) and (pointer:fine){
@@ -255,7 +277,7 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
     <div><div class="mono-label t1">YOUR SCORECARD</div><div class="t2" id="teaserLine"></div></div>
     <div class="big" id="teaserNum">0</div>
   </button>
-  <p class="fine">Flags are not safety verdicts or medical&nbsp;advice. Sample&nbsp;data.</p>
+  <p class="fine">Flags come from the EU endocrine disruptor lists. Not safety verdicts or medical&nbsp;advice. Product data: Open Beauty&nbsp;Facts.</p>
   <p class="fine">© 2026 V. Herman. All rights reserved. Ick&nbsp;Check™</p>
 </div>
 </section>
@@ -276,10 +298,25 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
   </div>
 
   <div class="cam tall" id="camTall">
-    <svg class="code" width="346" height="270" viewBox="0 0 346 270" aria-hidden="true"><g fill="#6B6055"><rect x="108" y="86" width="5" height="78"/><rect x="118" y="86" width="3" height="78"/><rect x="126" y="86" width="7" height="78"/><rect x="138" y="86" width="3" height="78"/><rect x="146" y="86" width="5" height="78"/><rect x="157" y="86" width="9" height="78"/><rect x="171" y="86" width="3" height="78"/><rect x="179" y="86" width="6" height="78"/><rect x="190" y="86" width="3" height="78"/><rect x="198" y="86" width="8" height="78"/><rect x="211" y="86" width="4" height="78"/><rect x="220" y="86" width="5" height="78"/><rect x="230" y="86" width="3" height="78"/></g><rect x="60" y="130" width="226" height="4" rx="2" fill="#D7FF3A"/></svg>
+    <video id="camVideo" playsinline muted autoplay hidden></video>
+    <svg class="code" id="camArt" width="346" height="270" viewBox="0 0 346 270" aria-hidden="true"><g fill="#6B6055"><rect x="108" y="86" width="5" height="78"/><rect x="118" y="86" width="3" height="78"/><rect x="126" y="86" width="7" height="78"/><rect x="138" y="86" width="3" height="78"/><rect x="146" y="86" width="5" height="78"/><rect x="157" y="86" width="9" height="78"/><rect x="171" y="86" width="3" height="78"/><rect x="179" y="86" width="6" height="78"/><rect x="190" y="86" width="3" height="78"/><rect x="198" y="86" width="8" height="78"/><rect x="211" y="86" width="4" height="78"/><rect x="220" y="86" width="5" height="78"/><rect x="230" y="86" width="3" height="78"/></g><rect x="60" y="130" width="226" height="4" rx="2" fill="#D7FF3A"/></svg>
     <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
-    <button type="button" class="tap" id="tapScan">Tap to scan</button>
-    <div class="cam-label">POINT AT THE BARCODE</div>
+    <button type="button" class="tap" id="tapScan">Start camera</button>
+    <div class="cam-label" id="camLabel" role="status">POINT AT THE BARCODE</div>
+  </div>
+
+  <div class="scan-alt" id="scanAlt">
+    <div class="alt-row">
+      <label class="ghost-pill" for="barcodePhoto">Photo of the barcode</label>
+      <input class="sr-only" id="barcodePhoto" type="file" accept="image/*" capture="environment">
+    </div>
+    <form class="alt-row" id="codeForm" novalidate>
+      <label class="sr-only" for="codeInput">Barcode number</label>
+      <input class="input" id="codeInput" inputmode="numeric" placeholder="Barcode number" autocomplete="off" maxlength="14">
+      <button type="submit" class="ghost-pill">Look up</button>
+    </form>
+    <div class="err" id="scanErr" role="alert" hidden></div>
+    <p class="src">Product data from <a href="https://world.openbeautyfacts.org" target="_blank" rel="noopener">Open Beauty Facts</a>, an open database (ODbL). Flags from the <a href="https://edlists.org" target="_blank" rel="noopener">EU endocrine disruptor lists</a>.</p>
   </div>
 
   <div class="cam short" id="camShort" hidden>
@@ -289,6 +326,7 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
   </div>
 
   <form class="paste" id="pasteForm" hidden novalidate>
+    <div class="notice" id="pasteNotice" role="status" hidden></div>
     <div class="field">
       <label class="mono-label" for="pasteName">WHAT IS IT? (OPTIONAL)</label>
       <input class="input" id="pasteName" type="text" placeholder="Night cream" autocomplete="off" maxlength="60">
@@ -298,8 +336,13 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
       <textarea class="input" id="pasteText" placeholder="Water, Glycerin, Shea Butter..."></textarea>
       <div class="paste-meta">
         <div class="count" id="pasteCount">0 ingredients</div>
-        <button type="button" class="ghost-pill" id="tryExample">Try an example</button>
+        <div class="btns">
+          <label class="ghost-pill" for="ocrFile">Snap the label</label>
+          <input class="sr-only" id="ocrFile" type="file" accept="image/*" capture="environment">
+          <button type="button" class="ghost-pill" id="tryExample">Try an example</button>
+        </div>
       </div>
+      <div class="ocr-status" id="ocrStatus" role="status" hidden></div>
     </div>
     <div class="err" id="pasteErr" role="alert" hidden>Paste an ingredient list first.</div>
     <button type="submit" class="btn-primary btn-lime">
@@ -318,12 +361,14 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
     </div>
     <div class="chips" id="foundChips"></div>
     <div class="note" id="foundNote"></div>
+    <p class="src" id="foundSrc"></p>
     <div class="stack" style="gap:10px;margin-top:2px">
       <button type="button" class="btn-primary add" id="addBtn">
         <span>Add to my scorecard</span>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D7FF3A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </button>
       <button type="button" class="btn-outline" id="againBtn">Scan again</button>
+      <button type="button" class="btn-link on-cream" id="editBtn">Fix the ingredient list</button>
     </div>
   </div>
 </div>
@@ -352,8 +397,7 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
     <div class="rows" id="rows"></div>
     <div class="dash"></div>
     <div>
-      <div class="disclaim">Flags come from public lists. Not a safety verdict or medical&nbsp;advice.</div>
-      <div class="sample">SAMPLE DATA FOR DESIGN REVIEW</div>
+      <div class="disclaim">Flags come from the EU endocrine disruptor lists (edlists.org). Not a safety verdict or medical&nbsp;advice.</div>
     </div>
   </div>
 
@@ -411,24 +455,11 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
   <div class="store-row"><span class="store"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18h2"/></svg>iPhone app <small>SOON</small></span><span class="store"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18h2"/></svg>Android app <small>SOON</small></span></div>
 </aside>
 
+<script src="data/flags.js"></script>
 <script>
 (function () {
   'use strict';
 
-  /* ---------- Sample data. Replace with a real ingredient list before launch. ---------- */
-  var CATALOG = [
-    { name: 'Daily moisturizer', clear: ['Water', 'Glycerin', 'Shea butter'], more: 20, flags: [{ ing: 'Propylparaben', src: 'EU endocrine disruptor list' }] },
-    { name: 'Sunscreen SPF 30', clear: ['Water', 'Zinc oxide', 'Aloe'], more: 18, flags: [{ ing: 'Oxybenzone', src: 'EU endocrine disruptor list' }] },
-    { name: 'Shampoo', clear: ['Water', 'Coco-glucoside', 'Glycerin'], more: 15, flags: [] },
-    { name: 'Body wash', clear: ['Water', 'Glycerin'], more: 22, flags: [{ ing: 'Undisclosed fragrance blend', src: 'Undisclosed ingredients' }, { ing: 'Triclosan', src: 'EU endocrine disruptor list' }] }
-  ];
-  var RULES = [
-    { k: 'propylparaben', ing: 'Propylparaben', src: 'EU endocrine disruptor list' },
-    { k: 'oxybenzone', ing: 'Oxybenzone', src: 'EU endocrine disruptor list' },
-    { k: 'triclosan', ing: 'Triclosan', src: 'EU endocrine disruptor list' },
-    { k: 'fragrance', ing: 'Fragrance', src: 'Undisclosed ingredients' },
-    { k: 'parfum', ing: 'Fragrance', src: 'Undisclosed ingredients' }
-  ];
   var EXAMPLE = 'Aqua, Glycerin, Propylparaben, Cetearyl Alcohol, Shea Butter, Parfum, Tocopherol';
   var NB = ' ';
   var STORE_KEY = 'ickcheck.scorecard.v1';
@@ -484,13 +515,41 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
     } catch (e) { return null; }
   }
 
+
+  /* ---------- flag matching (EU endocrine disruptor lists, see data/flags.js) ---------- */
+  var LISTS = window.ICK_LISTS || {}, FLAGS = window.ICK_FLAGS || [], ORDER = ['I', 'II', 'III'];
+  function norm(t) { return String(t || '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[\u2010-\u2015]/g, '-'); }
+  function esc(t) { return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  var MATCHERS = FLAGS.map(function (f) {
+    var best = ORDER.filter(function (l) { return f.lists.indexOf(l) >= 0; })[0] || 'III';
+    var re = new RegExp('(^|[^a-z0-9])(' + f.terms.map(function (t) { return esc(norm(t)); }).join('|') + ')(?=[^a-z0-9]|$)');
+    return { f: f, best: best, re: re };
+  });
+  function findFlags(text) {
+    var n = norm(text), out = [];
+    MATCHERS.forEach(function (m) { if (m.re.test(n)) out.push({ ing: m.f.name, src: (LISTS[m.best] || {}).label || 'EU ED list', list: m.best }); });
+    return out.sort(function (x, y) { return ORDER.indexOf(x.list) - ORDER.indexOf(y.list); });
+  }
+  function isFlagged(token) { var n = norm(token); return MATCHERS.some(function (m) { return m.re.test(n); }); }
+  function analyze(text, name, badge, origin) {
+    var tokens = tokenize(text);
+    var flags = findFlags(text);
+    var others = tokens.filter(function (t) { return !isFlagged(t); }).map(function (t) { t = t.replace(/[.]+$/, ''); return t.charAt(0).toUpperCase() + t.slice(1); }).filter(Boolean);
+    var shown = others.slice(0, 3);
+    var f = buildFound(name, badge, flags, shown, others.length - shown.length, tokens.length);
+    f.text = text; f.origin = origin;
+    return f;
+  }
+
   /* ---------- results ---------- */
   function buildFound(name, badge, flags, others, more, checked) {
     var chips = flags.map(function (f) { return { text: f.ing, flag: true }; })
       .concat(others.map(function (t) { return { text: t, flag: false }; }));
     if (more > 0) chips.push({ text: '+' + more + ' more', flag: false });
-    var note = flags.length ? plural(flags.length, 'flag') + '. ' + flagText(flags) + '.' : 'No flags found in our lists.';
-    return { name: name, badge: badge, flags: flags, chips: chips, count: checked + ' ingredients', note: nb(note) };
+    var note = flags.length
+      ? flags.map(function (f) { var l = LISTS[f.list] || {}; return f.ing + ': ' + (l.label || f.src) + (l.desc ? ', ' + l.desc.charAt(0).toLowerCase() + l.desc.slice(1) : '') + '.'; }).join('\n')
+      : nb('No flags found on the EU endocrine disruptor lists.');
+    return { name: name, badge: badge, flags: flags, chips: chips, count: checked + ' ingredients', note: note };
   }
 
   /* ---------- render ---------- */
@@ -506,7 +565,14 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
     var scan = state.mode === 'scan', found = state.found;
     $('tabScan').setAttribute('aria-pressed', String(scan));
     $('tabPaste').setAttribute('aria-pressed', String(!scan));
+    var scanning = state.screen === 'scanner' && scan && !found;
+    if (!scanning) stopCamera();
     $('camTall').hidden = !(scan && !found);
+    $('scanAlt').hidden = !(scan && !found);
+    $('camVideo').hidden = !cam.live;
+    $('camArt').style.display = cam.live ? 'none' : '';
+    $('tapScan').hidden = cam.live || cam.busy;
+    $('camLabel').textContent = cam.label;
     $('camShort').hidden = !(scan && found);
     $('pasteForm').hidden = !(!scan && !found);
     $('drawer').hidden = !found;
@@ -520,6 +586,18 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
       var note = $('foundNote'); note.textContent = found.note;
       note.className = 'note ' + (found.flags.length ? 'flag' : 'clear');
       $('againBtn').textContent = scan ? 'Scan again' : 'Edit ingredients';
+      $('editBtn').hidden = !(found.origin && found.origin.kind === 'obf');
+      var src = $('foundSrc'); src.textContent = '';
+      if (found.origin && found.origin.kind === 'obf') {
+        src.appendChild(document.createTextNode('Ingredients from '));
+        var a1 = el('a', null, 'Open Beauty Facts'); a1.href = found.origin.url; a1.target = '_blank'; a1.rel = 'noopener';
+        src.appendChild(a1);
+        src.appendChild(document.createTextNode(' (community data). Check them against your label. '));
+      }
+      src.appendChild(document.createTextNode('Flags: '));
+      var a2 = el('a', null, 'EU endocrine disruptor lists'); a2.href = 'https://edlists.org'; a2.target = '_blank'; a2.rel = 'noopener';
+      src.appendChild(a2);
+      src.appendChild(document.createTextNode('.'));
     }
 
     $('sharedChip').hidden = !state.shared;
@@ -653,15 +731,8 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
   document.addEventListener('click', function (e) {
     var t = e.target.closest('button'); if (!t) return;
     if (t.dataset.go) { if (t.dataset.go !== 'scorecard') leaveShared(); return go(t.dataset.go); }
-    if (t.dataset.mode) { state.mode = t.dataset.mode; state.found = null; $('pasteErr').hidden = true; return render(); }
+    if (t.dataset.mode) { state.mode = t.dataset.mode; state.found = null; $('pasteErr').hidden = true; showScanErr(''); return render(); }
     if (t.hasAttribute('data-close-share')) { $('share').hidden = true; return; }
-  });
-
-  $('tapScan').addEventListener('click', function () {
-    var p = CATALOG[state.scanCount % CATALOG.length];
-    state.found = buildFound(p.name, 'FOUND IT', p.flags, p.clear, p.more, p.flags.length + p.clear.length + p.more);
-    state.scanCount++;
-    render();
   });
 
   $('pasteText').addEventListener('input', function () { $('pasteErr').hidden = true; render(); });
@@ -671,16 +742,9 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
     e.preventDefault();
     var tokens = tokenize($('pasteText').value);
     if (!tokens.length) { $('pasteErr').hidden = false; return; }
-    var flags = [], others = [];
-    tokens.forEach(function (t) {
-      var low = t.toLowerCase();
-      var rule = RULES.filter(function (r) { return low.indexOf(r.k) >= 0; })[0];
-      if (rule) { if (!flags.some(function (f) { return f.ing === rule.ing; })) flags.push({ ing: rule.ing, src: rule.src }); }
-      else others.push(t.charAt(0).toUpperCase() + t.slice(1));
-    });
-    var shown = others.slice(0, 3);
     var name = $('pasteName').value.trim() || 'Pasted product';
-    state.found = buildFound(name, 'CHECKED', flags, shown, others.length - shown.length, tokens.length);
+    $('pasteNotice').hidden = true;
+    state.found = analyze($('pasteText').value, name, 'CHECKED', { kind: 'paste' });
     render();
   });
 
@@ -688,7 +752,7 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
 
   $('addBtn').addEventListener('click', function () {
     var f = state.found; if (!f) return;
-    state.items.push({ name: f.name.slice(0, 60), flags: f.flags });
+    state.items.push({ name: f.name.slice(0, 60), flags: f.flags.map(function (x) { return { ing: x.ing, src: x.src }; }) });
     save();
     $('pasteText').value = ''; $('pasteName').value = '';
     go('scorecard');
@@ -698,6 +762,163 @@ textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono
   $('openShare').addEventListener('click', function () { $('toast').hidden = true; $('linkBox').value = shareUrl(); $('share').hidden = false; });
   $('startOver').addEventListener('click', function () { state.items = []; state.scanCount = 0; save(); render(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') $('share').hidden = true; });
+
+
+  /* ---------- real scanner: camera, barcode photo, typed number ---------- */
+  var cam = { stream: null, live: false, busy: false, timer: null, label: 'POINT AT THE BARCODE' };
+  var FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'];
+  var detectorPromise = null;
+  function abs(path) { return new URL(path, location.href).href; }
+  function loadScript(src) {
+    return new Promise(function (res, rej) { var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = function () { rej(new Error('Could not load ' + src)); }; document.head.appendChild(s); });
+  }
+  function getDetector() {
+    if (detectorPromise) return detectorPromise;
+    detectorPromise = (async function () {
+      if ('BarcodeDetector' in window) {
+        try {
+          var sup = await window.BarcodeDetector.getSupportedFormats();
+          var f = FORMATS.filter(function (x) { return sup.indexOf(x) >= 0; });
+          if (f.indexOf('ean_13') >= 0) return new window.BarcodeDetector({ formats: f });
+        } catch (e) {}
+      }
+      await loadScript('vendor/barcode/ponyfill.js');
+      var api = window.BarcodeDetectionAPI;
+      api.prepareZXingModule({ overrides: { locateFile: function (p, prefix) { return p.slice(-5) === '.wasm' ? abs('vendor/barcode/zxing_reader.wasm') : prefix + p; } } });
+      return new api.BarcodeDetector({ formats: FORMATS });
+    })();
+    detectorPromise.catch(function () { detectorPromise = null; });
+    return detectorPromise;
+  }
+  function showScanErr(msg) { var e = $('scanErr'); e.textContent = msg || ''; e.hidden = !msg; }
+  function stopCamera() {
+    clearTimeout(cam.timer); cam.timer = null;
+    if (cam.stream) cam.stream.getTracks().forEach(function (t) { t.stop(); });
+    var v = $('camVideo'); if (v && v.srcObject) v.srcObject = null;
+    cam.stream = null; cam.live = false;
+  }
+  async function startCamera() {
+    showScanErr('');
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showScanErr('The camera isn’t available in this browser. Use Photo of the barcode, or type the number.'); return; }
+    cam.busy = true; cam.label = 'STARTING CAMERA'; render();
+    try {
+      var detector = await getDetector();
+      var stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+      if (state.screen !== 'scanner' || state.mode !== 'scan' || state.found) { stream.getTracks().forEach(function (t) { t.stop(); }); cam.busy = false; return; }
+      cam.stream = stream;
+      var v = $('camVideo'); v.srcObject = stream;
+      await v.play();
+      cam.live = true; cam.busy = false; cam.label = 'POINT AT THE BARCODE'; render();
+      var tick = async function () {
+        if (!cam.live) return;
+        try {
+          var r = await detector.detect(v);
+          if (r && r.length && r[0].rawValue) { var code = r[0].rawValue; stopCamera(); lookup(code); return; }
+        } catch (e) {}
+        cam.timer = setTimeout(tick, 200);
+      };
+      tick();
+    } catch (e) {
+      cam.busy = false; stopCamera(); cam.label = 'POINT AT THE BARCODE';
+      showScanErr(e && e.name === 'NotAllowedError' ? 'Camera access was blocked. Allow it in your browser settings, or use Photo of the barcode.' : 'The camera didn’t start. Use Photo of the barcode, or type the number.');
+      render();
+    }
+  }
+  async function imageFrom(file) {
+    try { return await createImageBitmap(file, { resizeWidth: 1600, resizeQuality: 'high' }); } catch (e) {}
+    return await createImageBitmap(file);
+  }
+  async function decodePhoto(file) {
+    showScanErr(''); cam.label = 'READING THE BARCODE'; render();
+    try {
+      var detector = await getDetector();
+      var r = await detector.detect(await imageFrom(file));
+      if (r && r.length && r[0].rawValue) return lookup(r[0].rawValue);
+      showScanErr('No barcode found in that photo. Try again closer, with the barcode flat and well lit.');
+    } catch (e) { showScanErr('That photo couldn’t be read. Try another, or type the number.'); }
+    cam.label = 'POINT AT THE BARCODE'; render();
+  }
+  async function fetchProduct(code) {
+    var ctrl = new AbortController(), t = setTimeout(function () { ctrl.abort(); }, 10000);
+    try {
+      var r = await fetch('https://world.openbeautyfacts.org/api/v2/product/' + encodeURIComponent(code) + '.json?fields=code,product_name,product_name_en,brands,ingredients_text_en,ingredients_text', { signal: ctrl.signal });
+      var j = await r.json();
+      return j && j.status === 1 ? j.product : null;
+    } finally { clearTimeout(t); }
+  }
+  async function lookup(raw) {
+    var code = String(raw || '').replace(/\D/g, '');
+    if (code.length < 8) { showScanErr('That doesn’t look like a product barcode. Try again.'); return; }
+    showScanErr(''); cam.label = 'LOOKING UP ' + code; render();
+    var tries = [code];
+    if (code.length === 12) tries.push('0' + code);
+    if (code.length === 13 && code.charAt(0) === '0') tries.push(code.slice(1));
+    var product = null;
+    try {
+      for (var i = 0; i < tries.length && !product; i++) product = await fetchProduct(tries[i]);
+    } catch (e) {
+      cam.label = 'POINT AT THE BARCODE';
+      showScanErr('The product database didn’t answer. Check your connection and try again, or paste the ingredients.');
+      render(); return;
+    }
+    cam.label = 'POINT AT THE BARCODE';
+    var pname = product ? [String(product.brands || '').split(',')[0].trim(), product.product_name_en || product.product_name || ''].filter(Boolean).join(' ').trim() : '';
+    var ing = product ? String(product.ingredients_text_en || product.ingredients_text || '').trim() : '';
+    if (product && ing.length > 10) {
+      state.found = analyze(ing, pname || ('Product ' + code), 'FOUND IT', { kind: 'obf', code: product.code || code, url: 'https://world.openbeautyfacts.org/product/' + (product.code || code) });
+      render(); return;
+    }
+    state.mode = 'paste'; state.found = null;
+    $('pasteName').value = pname.slice(0, 60);
+    var n = $('pasteNotice');
+    n.textContent = (product ? 'Found ' + (pname || 'this product') + ', but not its ingredient list yet. ' : 'Barcode ' + code + ' isn’t in the open database yet. ') + 'Snap or paste the ingredient list from the back of the bottle.';
+    n.hidden = false;
+    render();
+  }
+  $('tapScan').addEventListener('click', startCamera);
+  $('barcodePhoto').addEventListener('change', function () { var f = this.files && this.files[0]; this.value = ''; if (f) decodePhoto(f); });
+  $('codeForm').addEventListener('submit', function (e) { e.preventDefault(); lookup($('codeInput').value); });
+  $('editBtn').addEventListener('click', function () {
+    var f = state.found; if (!f) return;
+    state.mode = 'paste'; state.found = null;
+    $('pasteText').value = f.text || ''; $('pasteName').value = f.name.slice(0, 60);
+    $('pasteNotice').hidden = true; render();
+  });
+
+  /* ---------- label photo reading (runs on the phone; the photo is not uploaded) ---------- */
+  var ocrWorker = null;
+  function ocrStatus(msg) { var e = $('ocrStatus'); e.textContent = msg || ''; e.hidden = !msg; }
+  function cleanOcr(t) {
+    t = String(t || '').replace(/\r/g, '');
+    var m = t.match(/ingr[eé]dients?\s*[:\-]/i);
+    if (m) t = t.slice(m.index + m[0].length);
+    return t.replace(/-\n/g, '').replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim();
+  }
+  async function readLabel(file) {
+    ocrStatus('Loading the label reader. The first time takes a moment.');
+    try {
+      if (!window.Tesseract) await loadScript('vendor/tesseract/tesseract.min.js');
+      if (!ocrWorker) {
+        ocrWorker = await window.Tesseract.createWorker('eng', 1, {
+          workerPath: abs('vendor/tesseract/worker.min.js'),
+          corePath: abs('vendor/tesseract/core'),
+          langPath: abs('vendor/tesseract/lang'),
+          logger: function (m) { if (m && m.status === 'recognizing text') ocrStatus('Reading the label: ' + Math.round((m.progress || 0) * 100) + '%'); }
+        });
+      }
+      var bmp = await imageFrom(file), cv = document.createElement('canvas');
+      cv.width = bmp.width; cv.height = bmp.height; cv.getContext('2d').drawImage(bmp, 0, 0);
+      var r = await ocrWorker.recognize(cv);
+      var text = cleanOcr(r && r.data && r.data.text);
+      if (text.length < 10) { ocrStatus('Couldn’t read the ingredients in that photo. Try again closer, with good light.'); return; }
+      $('pasteText').value = text; $('pasteErr').hidden = true;
+      ocrStatus('Done. Check the text against the label, then tap Check ingredients. Your photo never left your phone.');
+      render();
+    } catch (e) {
+      ocrStatus('The label reader didn’t work on this device. Paste the ingredients instead.');
+    }
+  }
+  $('ocrFile').addEventListener('change', function () { var f = this.files && this.files[0]; this.value = ''; if (f) readLabel(f); });
 
   /* ---------- desktop panel: copy link ---------- */
   var deskCopy = $('deskCopy');
