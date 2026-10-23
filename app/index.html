@@ -232,6 +232,14 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
 .inapp{margin:14px var(--gutter) 0;border:2px solid var(--pink);border-radius:16px;padding:12px 14px;font-size:14.5px;line-height:1.4;color:var(--cream)}
 .inapp b{color:var(--pink)}
 
+/* Camera stop, share image, privacy */
+.tap.stop{background:var(--cream);bottom:70px}
+.share-img{display:block;margin:0 auto;max-height:240px;max-width:100%;border-radius:16px;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--lilac);background:var(--lime)}
+.share-img-wait{font-family:var(--mono);font-size:12px;font-weight:700;text-align:center;padding:24px 0}
+.share-actions.six{grid-template-columns:repeat(3, minmax(0, 1fr));row-gap:14px}
+.share-hint{font-size:13.5px;line-height:1.4;text-align:center;color:var(--muted-light)}
+.share-act[disabled]{opacity:.45}
+
 /* Desktop: a side panel that sends people to their phone */
 .desk{display:none}
 @media (min-width:900px) and (hover:hover) and (pointer:fine){
@@ -291,7 +299,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     <div><div class="mono-label t1">YOUR SCORECARD</div><div class="t2" id="teaserLine"></div></div>
     <div class="big" id="teaserNum">0</div>
   </button>
-  <p class="fine">Flags come from the EU endocrine disruptor lists. Not safety verdicts or medical&nbsp;advice. Product data: Open Beauty&nbsp;Facts.</p>
+  <p class="fine">Flags come from the EU endocrine disruptor lists. Not safety verdicts or medical&nbsp;advice. Product data: Open Beauty&nbsp;Facts. <a href="privacy.html" style="color:inherit">Privacy</a>.</p>
   <p class="fine">© 2026 V. Herman. All rights reserved. Ick&nbsp;Check™</p>
 </div>
 </section>
@@ -319,6 +327,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     <svg class="code" id="camArt" width="346" height="270" viewBox="0 0 346 270" aria-hidden="true"><g fill="#6B6055"><rect x="108" y="86" width="5" height="78"/><rect x="118" y="86" width="3" height="78"/><rect x="126" y="86" width="7" height="78"/><rect x="138" y="86" width="3" height="78"/><rect x="146" y="86" width="5" height="78"/><rect x="157" y="86" width="9" height="78"/><rect x="171" y="86" width="3" height="78"/><rect x="179" y="86" width="6" height="78"/><rect x="190" y="86" width="3" height="78"/><rect x="198" y="86" width="8" height="78"/><rect x="211" y="86" width="4" height="78"/><rect x="220" y="86" width="5" height="78"/><rect x="230" y="86" width="3" height="78"/></g><rect x="60" y="130" width="226" height="4" rx="2" fill="#D7FF3A"/></svg>
     <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
     <button type="button" class="tap" id="tapScan">Start camera</button>
+    <button type="button" class="tap stop" id="stopCam" hidden>Stop camera</button>
     <div class="cam-label" id="camLabel" role="status">POINT AT THE BARCODE</div>
   </div>
 
@@ -333,7 +342,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       <button type="submit" class="ghost-pill">Look up</button>
     </form>
     <div class="err" id="scanErr" role="alert" hidden></div>
-    <p class="src">Product data from <a href="https://world.openbeautyfacts.org" target="_blank" rel="noopener">Open Beauty Facts</a>, an open database (ODbL). Flags from the <a href="https://edlists.org" target="_blank" rel="noopener">EU endocrine disruptor lists</a>.</p>
+    <p class="src">Product data from <a href="https://world.openbeautyfacts.org" target="_blank" rel="noopener">Open Beauty Facts</a>, an open database (ODbL). Flags from the <a href="https://edlists.org" target="_blank" rel="noopener">EU endocrine disruptor lists</a>. <a href="privacy.html">Camera &amp; privacy</a>.</p>
   </div>
 
   <div class="cam short" id="camShort" hidden>
@@ -457,17 +466,17 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
     <div class="grab"></div>
     <h2 id="shareTitle">Share your scorecard</h2>
-    <div class="preview">
-      <div class="n" id="prevNum">0</div>
-      <div><div class="t">My routine scorecard</div><div class="s" id="prevLine"></div></div>
-    </div>
+    <div id="shareImgWrap"><div class="share-img-wait" id="shareWait">PREPARING YOUR IMAGE…</div><img class="share-img" id="shareImg" alt="Your scorecard image" hidden></div>
     <input class="link-box" id="linkBox" type="text" readonly aria-label="Scorecard link">
-    <div class="share-actions">
-      <button type="button" class="share-act" id="actCopy"><span class="circ" style="background:var(--lime)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span><span>Copy link</span></button>
-      <button type="button" class="share-act" id="actSave"><span class="circ" style="background:var(--pink)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></span><span>Save image</span></button>
-      <button type="button" class="share-act" id="actPin"><span class="circ" style="background:var(--orange)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6z"/><path d="M12 14v7"/></svg></span><span>Pinterest</span></button>
-      <button type="button" class="share-act" id="actMore"><span class="circ" style="background:var(--lilac)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></span><span>More</span></button>
+    <div class="share-actions six">
+      <button type="button" class="share-act" id="actInsta" disabled><span class="circ" style="background:var(--pink)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></span><span>Instagram</span></button>
+      <button type="button" class="share-act" id="actTikTok" disabled><span class="circ" style="background:var(--lilac)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></span><span>TikTok</span></button>
+      <button type="button" class="share-act" id="actPin" disabled><span class="circ" style="background:var(--orange)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></span><span>Pinterest</span></button>
+      <button type="button" class="share-act" id="actSave" disabled><span class="circ" style="background:var(--lime)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></span><span>Save image</span></button>
+      <button type="button" class="share-act" id="actCopy" disabled><span class="circ" style="background:var(--cream)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span><span>Copy link</span></button>
+      <button type="button" class="share-act" id="actMore" disabled><span class="circ" style="background:var(--mint)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></span><span>More</span></button>
     </div>
+    <p class="share-hint" id="shareHint">Instagram, TikTok and Pinterest: your phone’s share menu opens. Pick the app, then post to Stories, a Pin or your feed.</p>
     <div class="toast" id="toast" role="status" hidden></div>
     <button type="button" class="btn-primary done" data-close-share>Done</button>
   </div>
@@ -494,8 +503,17 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
   var EXAMPLE = 'Aqua, Glycerin, Propylparaben, Cetearyl Alcohol, Shea Butter, Parfum, Tocopherol';
   var NB = ' ';
   var STORE_KEY = 'ickcheck.scorecard.v1';
+  var MINE_KEY = 'ickcheck.myproducts.v1';
+  function mineGet(code) { try { var m = JSON.parse(localStorage.getItem(MINE_KEY) || '{}'); return m[code] || null; } catch (e) { return null; } }
+  function mineSet(code, name, text) {
+    try {
+      var m = JSON.parse(localStorage.getItem(MINE_KEY) || '{}'); m[code] = { name: String(name || '').slice(0, 60), text: String(text || '').slice(0, 4000), t: Date.now() };
+      var keys = Object.keys(m); if (keys.length > 200) keys.sort(function (x, y) { return m[x].t - m[y].t; }).slice(0, keys.length - 200).forEach(function (k) { delete m[k]; });
+      localStorage.setItem(MINE_KEY, JSON.stringify(m));
+    } catch (e) {}
+  }
 
-  var state = { screen: 'home', mode: 'scan', found: null, items: [], scanCount: 0, shared: false };
+  var state = { screen: 'home', mode: 'scan', found: null, items: [], scanCount: 0, shared: false, pendingCode: '' };
   var $ = function (id) { return document.getElementById(id); };
 
   /* ---------- helpers ---------- */
@@ -610,6 +628,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     $('camVideo').hidden = !cam.live;
     $('camArt').style.display = cam.live ? 'none' : '';
     $('tapScan').hidden = cam.live || cam.busy;
+    $('stopCam').hidden = !cam.live;
     $('camLabel').textContent = cam.label;
     $('camShort').hidden = !(scan && found);
     $('pasteForm').hidden = !(paste && !found);
@@ -632,6 +651,11 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
         var a1 = el('a', null, 'Open Beauty Facts'); a1.href = found.origin.url; a1.target = '_blank'; a1.rel = 'noopener';
         src.appendChild(a1);
         src.appendChild(document.createTextNode(' (community data). Check them against your label. '));
+      }
+      if (found.origin && (found.origin.kind === 'local' || found.origin.kind === 'saved')) {
+        src.appendChild(document.createTextNode(found.origin.kind === 'local' ? 'From the label you saved on this phone. ' : 'Saved on this phone for your next scan. '));
+        var a3 = el('a', null, 'Add it to Open Beauty Facts'); a3.href = 'https://world.openbeautyfacts.org/cgi/product.pl?type=search_or_add&action=process&code=' + encodeURIComponent(found.origin.code); a3.target = '_blank'; a3.rel = 'noopener';
+        src.appendChild(a3); src.appendChild(document.createTextNode(' so everyone can find it. '));
       }
       src.appendChild(document.createTextNode('Flags: '));
       var a2 = el('a', null, 'EU endocrine disruptor lists'); a2.href = 'https://edlists.org'; a2.target = '_blank'; a2.rel = 'noopener';
@@ -659,8 +683,6 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       row.appendChild(el('div', 'pill ' + (!i.flags.length ? 'clear' : allSoft ? 'flag-soft' : 'flag'), plural(i.flags.length, 'flag')));
       rows.appendChild(row);
     });
-    $('prevNum').textContent = t.total;
-    $('prevLine').textContent = t.summary;
   }
 
   function go(where) {
@@ -729,49 +751,87 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
   function toast(msg) { var t = $('toast'); t.textContent = msg; t.hidden = false; }
   function shareText() { var t = totals(); return 'My routine scorecard on Ick Check: ' + t.summary.replace(/ /g, ' ') + '. Is yours actually clean?'; }
 
+  /* ---------- sharing: the image is built when the panel opens, so the share menu opens instantly on tap ---------- */
+  var shareImgs = { pin: null, story: null, url: null };
+  function blobToStory(blob) {
+    return createImageBitmap(blob).then(function (bmp) {
+      var W = 1080, H = 1920, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+      var x = cv.getContext('2d'); x.fillStyle = '#D7FF3A'; x.fillRect(0, 0, W, H);
+      var w = W, h = Math.round(bmp.height * W / bmp.width); x.drawImage(bmp, 0, Math.round((H - h) / 2), w, h);
+      return new Promise(function (res) { cv.toBlob(function (b) { res(b); }, 'image/png'); });
+    });
+  }
+  function prepareShareImages() {
+    shareImgs.pin = shareImgs.story = null;
+    if (shareImgs.url) { URL.revokeObjectURL(shareImgs.url); shareImgs.url = null; }
+    ['actInsta', 'actTikTok', 'actPin', 'actSave', 'actMore'].forEach(function (id) { $(id).disabled = true; });
+    $('actCopy').disabled = false;
+    $('shareWait').hidden = false; $('shareImg').hidden = true;
+    return makeImage().then(function (pin) {
+      shareImgs.pin = pin;
+      shareImgs.url = URL.createObjectURL(pin);
+      $('shareImg').src = shareImgs.url; $('shareImg').hidden = false; $('shareWait').hidden = true;
+      return blobToStory(pin);
+    }).then(function (story) {
+      shareImgs.story = story;
+    }).catch(function () {
+      $('shareWait').textContent = 'COULDN’T MAKE THE IMAGE HERE. COPY LINK STILL WORKS.';
+    }).then(function () {
+      ['actInsta', 'actTikTok', 'actPin', 'actSave', 'actMore'].forEach(function (id) { $(id).disabled = !shareImgs.pin; });
+    });
+  }
+  function fileOf(blob, name) { return typeof File === 'function' ? new File([blob], name, { type: 'image/png' }) : null; }
+  function canShareFile(f) { try { return !!(f && navigator.share && navigator.canShare && navigator.canShare({ files: [f] })); } catch (e) { return false; } }
+  function download(blob, name) {
+    var a = document.createElement('a'), u = URL.createObjectURL(blob);
+    a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+  }
+  function shareImage(blob, name, app, fallback) {
+    if (!blob) { toast('STILL PREPARING. TRY AGAIN IN A SECOND.'); return; }
+    var f = fileOf(blob, name);
+    if (canShareFile(f)) {
+      navigator.share({ files: [f] }).then(function () { toast(app ? 'SENT TO YOUR SHARE MENU' : 'DONE'); })
+        .catch(function (e) { if (!e || e.name !== 'AbortError') { download(blob, name); toast('IMAGE SAVED. ' + (app ? 'OPEN ' + app.toUpperCase() + ' AND ADD IT FROM YOUR PHOTOS.' : '')); } });
+      if (app) toast('PICK ' + app.toUpperCase() + ' IN THE MENU');
+      return;
+    }
+    if (fallback) return fallback();
+    download(blob, name);
+    toast(app ? 'IMAGE SAVED. OPEN ' + app.toUpperCase() + ' AND ADD IT FROM YOUR PHOTOS.' : 'IMAGE SAVED');
+  }
+  $('actInsta').addEventListener('click', function () { shareImage(shareImgs.story, 'ickcheck-scorecard-story.png', 'Instagram'); });
+  $('actTikTok').addEventListener('click', function () { shareImage(shareImgs.story, 'ickcheck-scorecard-story.png', 'TikTok'); });
+  $('actPin').addEventListener('click', function () {
+    shareImage(shareImgs.pin, 'ickcheck-scorecard.png', 'Pinterest', function () {
+      var media = new URL('images/pin-image.png', baseUrl()).href;
+      var pin = 'https://www.pinterest.com/pin/create/button/?url=' + encodeURIComponent(baseUrl()) +
+        '&media=' + encodeURIComponent(media) + '&description=' + encodeURIComponent(shareText());
+      var a = document.createElement('a'); a.href = pin; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove();
+      download(shareImgs.pin, 'ickcheck-scorecard.png');
+      toast('OPENING PINTEREST. YOUR SCORECARD IMAGE IS SAVED TO UPLOAD.');
+    });
+  });
+  $('actSave').addEventListener('click', function () { shareImage(shareImgs.pin, 'ickcheck-scorecard.png', ''); });
   $('actCopy').addEventListener('click', function () {
     var url = shareUrl(), box = $('linkBox');
     var fallback = function () { box.focus(); box.select(); toast('LINK SELECTED. COPY IT.'); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { toast('LINK COPIED'); }, fallback);
     else fallback();
   });
-
-  $('actSave').addEventListener('click', function () {
-    makeImage().then(function (blob) {
-      if (!blob) throw new Error('no image');
-      var a = document.createElement('a'), u = URL.createObjectURL(blob);
-      a.href = u; a.download = 'ickcheck-scorecard.png'; document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
-      toast('IMAGE SAVED');
-    }).catch(function () { toast('COULD NOT SAVE HERE. TRY ON THE LIVE SITE.'); });
-  });
-
-  $('actPin').addEventListener('click', function () {
-    var media = new URL('images/pin-image.png', baseUrl()).href;
-    var pin = 'https://www.pinterest.com/pin/create/button/?url=' + encodeURIComponent(baseUrl()) +
-      '&media=' + encodeURIComponent(media) + '&description=' + encodeURIComponent(shareText());
-    var w = window.open(pin, '_blank', 'noopener');
-    if (!w) location.href = pin;
-    toast('OPENING PINTEREST');
-  });
-
   $('actMore').addEventListener('click', function () {
-    if (!navigator.share) { toast('SHARING ISN’T AVAILABLE IN THIS BROWSER'); return; }
-    makeImage().then(function (blob) {
-      var data = { title: 'My scorecard on Ick Check', text: shareText(), url: shareUrl() };
-      if (blob && typeof File === 'function') {
-        var file = new File([blob], 'ickcheck-scorecard.png', { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) data.files = [file];
-      }
-      return navigator.share(data);
-    }).catch(function (e) { if (!e || e.name !== 'AbortError') toast('SHARING DIDN’T WORK HERE'); });
+    if (!navigator.share) { $('actCopy').click(); return; }
+    var data = { title: 'My scorecard on Ick Check', text: shareText(), url: shareUrl() };
+    var f = shareImgs.pin && fileOf(shareImgs.pin, 'ickcheck-scorecard.png');
+    if (canShareFile(f)) data.files = [f];
+    navigator.share(data).catch(function (e) { if (!e || e.name !== 'AbortError') toast('SHARING DIDN’T WORK HERE. TRY COPY LINK.'); });
   });
 
   /* ---------- events ---------- */
   document.addEventListener('click', function (e) {
     var t = e.target.closest('button'); if (!t) return;
     if (t.dataset.go) { if (t.dataset.go !== 'scorecard') leaveShared(); return go(t.dataset.go); }
-    if (t.dataset.mode) { state.mode = t.dataset.mode; state.found = null; $('pasteErr').hidden = true; showScanErr(''); return render(); }
+    if (t.dataset.mode) { state.mode = t.dataset.mode; state.found = null; $('pasteErr').hidden = true; showScanErr(''); if (t.dataset.mode !== 'paste') { state.pendingCode = ''; $('pasteNotice').hidden = true; } return render(); }
     if (t.hasAttribute('data-close-share')) { $('share').hidden = true; return; }
   });
 
@@ -784,7 +844,9 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     if (!tokens.length) { $('pasteErr').hidden = false; return; }
     var name = $('pasteName').value.trim() || 'Pasted product';
     $('pasteNotice').hidden = true;
-    state.found = analyze($('pasteText').value, name, 'CHECKED', { kind: 'paste' });
+    var pc = state.pendingCode;
+    if (pc) { mineSet(pc, name === 'Pasted product' ? '' : name, $('pasteText').value); state.pendingCode = ''; }
+    state.found = analyze($('pasteText').value, name, 'CHECKED', pc ? { kind: 'saved', code: pc } : { kind: 'paste' });
     render();
   });
 
@@ -799,7 +861,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
   });
 
   $('scanAnother').addEventListener('click', function () { leaveShared(); go('scan'); });
-  $('openShare').addEventListener('click', function () { $('toast').hidden = true; $('linkBox').value = shareUrl(); $('share').hidden = false; });
+  $('openShare').addEventListener('click', function () { $('toast').hidden = true; $('linkBox').value = shareUrl(); $('share').hidden = false; prepareShareImages(); });
   $('startOver').addEventListener('click', function () { state.items = []; state.scanCount = 0; save(); render(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') $('share').hidden = true; });
 
@@ -895,7 +957,10 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
   async function lookup(raw) {
     var code = String(raw || '').replace(/\D/g, '');
     if (code.length < 8) { showScanErr('That doesn’t look like a product barcode. Try again.'); return; }
-    showScanErr(''); cam.label = 'LOOKING UP ' + code; render();
+    showScanErr('');
+    var mine = mineGet(code);
+    if (mine && mine.text) { state.found = analyze(mine.text, mine.name || ('Product ' + code), 'FOUND IT', { kind: 'local', code: code }); render(); return; }
+    cam.label = 'LOOKING UP ' + code; render();
     var tries = [code];
     if (code.length === 12) tries.push('0' + code);
     if (code.length === 13 && code.charAt(0) === '0') tries.push(code.slice(1));
@@ -914,14 +979,15 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       state.found = analyze(ing, pname || ('Product ' + code), 'FOUND IT', { kind: 'obf', code: product.code || code, url: 'https://world.openbeautyfacts.org/product/' + (product.code || code) });
       render(); return;
     }
-    state.mode = 'paste'; state.found = null;
+    state.mode = 'paste'; state.found = null; state.pendingCode = code;
     $('pasteName').value = pname.slice(0, 60);
     var n = $('pasteNotice');
-    n.textContent = (product ? 'Found ' + (pname || 'this product') + ', but not its ingredient list yet. ' : 'Barcode ' + code + ' isn’t in the open database yet. ') + 'Snap or paste the ingredient list from the back of the bottle.';
+    n.textContent = (product ? 'Found ' + (pname || 'this product') + ', but not its ingredient list yet. ' : 'Barcode ' + code + ' isn’t in the open database yet. ') + 'Snap or paste the ingredient list from the back of the bottle. We’ll remember it on this phone for next time.';
     n.hidden = false;
     render();
   }
   $('tapScan').addEventListener('click', startCamera);
+  $('stopCam').addEventListener('click', function () { stopCamera(); cam.label = 'CAMERA OFF'; render(); });
   $('barcodePhoto').addEventListener('change', function () { var f = this.files && this.files[0]; this.value = ''; if (f) decodePhoto(f); });
   $('codeForm').addEventListener('submit', function (e) { e.preventDefault(); lookup($('codeInput').value); });
   $('editBtn').addEventListener('click', function () {
