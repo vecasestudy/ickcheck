@@ -47,13 +47,15 @@ async function fetchJson(url, init, ms = 6000) {
 }
 
 /* ---------- product lookups ---------- */
-async function inci(env, code) {
-  if (!env.INCI_KEY) return null;
-  const hit = await getJ(env, 'inci:' + code);
+async function inci(env, code, trace) {
+  const apiKey = env.INCI_KEY || env['INCI-KEY'];
+  if (!apiKey) { if (trace) trace.push('inci: no key set'); return null; }
+  const hit = trace ? null : await getJ(env, 'inci:' + code);
   if (hit) return hit.miss ? null : hit;
   const month = new Date().toISOString().slice(0, 7);
-  if (!(await underCap(env, 'cap:inci:' + month, Number(env.INCI_MONTHLY_CAP) || 1900, 40 * DAY))) return null;
-  const r = await fetchJson('https://inciapi.com/v1/products/' + code, { headers: { 'X-API-Key': env.INCI_KEY } });
+  if (!(await underCap(env, 'cap:inci:' + month, Number(env.INCI_MONTHLY_CAP) || 1900, 40 * DAY))) { if (trace) trace.push('inci: monthly cap reached'); return null; }
+  const r = await fetchJson('https://inciapi.com/v1/products/' + code, { headers: { 'X-API-Key': apiKey } });
+  if (trace) trace.push('inci ' + code + ': status ' + r.status + (r.body && r.body.product ? ', product returned' : ''));
   if (r.status !== 200 && r.status !== 404) return null;              // their outage: do not remember it
   const p = r.body && r.body.product;
   const list = p && p.details && Array.isArray(p.details.inci) ? p.details.inci.join(', ') : '';
@@ -63,10 +65,11 @@ async function inci(env, code) {
   await putJ(env, 'inci:' + code, out, 60 * DAY);
   return out;
 }
-async function upcName(env, code) {
-  const hit = await getJ(env, 'upc:' + code);
+async function upcName(env, code, trace) {
+  const hit = trace ? null : await getJ(env, 'upc:' + code);
   if (hit) return hit.miss ? null : hit.name;
   const r = await fetchJson('https://api.upcitemdb.com/prod/trial/lookup?upc=' + code, { headers: { Accept: 'application/json' } });
+  if (trace) trace.push('upcitemdb ' + code + ': status ' + r.status + ', items ' + ((r.body && r.body.items && r.body.items.length) || 0));
   if (r.status !== 200) return null;                                  // includes their daily limit
   const it = r.body && r.body.items && r.body.items[0];
   const name = it ? String(it.title || [it.brand, it.model].filter(Boolean).join(' ')).slice(0, 120) : '';
@@ -76,17 +79,19 @@ async function upcName(env, code) {
 async function lookup(req, env, url) {
   const code = cleanCode(url.searchParams.get('code'));
   if (!code) return json(req, { error: 'bad_code' }, 400);
+  /* debug=1 skips the cache and reports what each source answered (status codes only, never the key) */
+  const trace = url.searchParams.get('debug') === '1' ? [] : null;
   const codes = [code]; if (code.length === 12) codes.push('0' + code); if (code.length === 13 && code[0] === '0') codes.push(code.slice(1));
   for (const c of codes) {
     const shared = await getJ(env, 'label:' + c);
     if (shared) return json(req, { source: 'community', code: c, name: shared.name, ingredients: shared.text });
   }
   for (const c of codes) {
-    const p = await inci(env, c);
-    if (p) return json(req, { source: 'inci', code: c, name: p.name, ingredients: p.ingredients });
+    const p = await inci(env, c, trace);
+    if (p) return json(req, { source: 'inci', code: c, name: p.name, ingredients: p.ingredients, trace: trace || undefined });
   }
-  const name = await upcName(env, code);
-  return json(req, name ? { source: 'upcitemdb', code, name, ingredients: '' } : { source: null, code });
+  const name = await upcName(env, code, trace);
+  return json(req, { ...(name ? { source: 'upcitemdb', code, name, ingredients: '' } : { source: null, code }), trace: trace || undefined });
 }
 
 /* ---------- shared labels ---------- */
