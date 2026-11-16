@@ -143,7 +143,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .input:focus{border-color:var(--lime)}
 .input::placeholder{color:#8F8575}
 input.input{min-height:52px;padding:0 16px;font-weight:600;font-size:17px}
-textarea.input{height:150px;padding:14px 16px;resize:none;font-weight:600;font-size:16px;line-height:1.45;display:block}
+textarea.input{height:110px;padding:14px 16px;resize:none;font-weight:600;font-size:16px;line-height:1.45;display:block}
 .paste-meta{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .paste-meta .count{font-family:var(--mono);font-size:12px;color:var(--muted-dark)}
 .ghost-pill{min-height:44px;padding:0 16px;border:2px solid var(--cream);background:transparent;color:var(--cream);border-radius:999px;font-weight:600;font-size:14px}
@@ -220,8 +220,25 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
 .note{white-space:pre-line}
 .paste-meta .count{white-space:nowrap}
 .mini-link{min-height:44px;margin:-10px 0;padding:0 2px;border:none;background:transparent;color:var(--cream);font-weight:600;font-size:14px;text-decoration:underline}
-.paste-acts{display:flex;gap:10px}
-.paste-acts .ghost-pill{flex:1;display:inline-flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer}
+.paste-meta{flex-wrap:wrap;row-gap:0}
+.paste-meta .count{margin-right:auto}
+.snap-btn{display:flex;align-items:center;gap:14px;min-height:68px;padding:10px 18px;border-radius:18px;background:var(--lime);color:var(--ink);cursor:pointer;box-shadow:4px 4px 0 var(--lilac)}
+.snap-btn b{display:block;font-weight:800;font-size:19px;line-height:1.15}
+.snap-btn small{display:block;font-weight:600;font-size:13px;line-height:1.25;margin-top:2px}
+.snap-btn:focus-within,.sr-only:focus-visible+.snap-btn{outline:3px solid var(--lilac);outline-offset:2px}
+.or-line{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--muted-dark)}
+.or-line::before,.or-line::after{content:"";flex:1;border-top:2px dashed #4A433B}
+/* Snap is the main action until there is text to check */
+.paste #checkBtn{background:transparent;color:var(--cream);border:2.5px solid var(--cream)}
+.paste #checkBtn svg{stroke:var(--cream)}
+.paste.has-text #checkBtn{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+.paste.has-text #checkBtn svg{stroke:var(--ink)}
+.paste.has-text .snap-btn{background:transparent;color:var(--cream);border:2px solid var(--cream);box-shadow:none;min-height:52px}
+.paste.has-text .snap-btn small{display:none}
+.group-h{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.06em;margin-top:2px}
+.group-h i{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.group-h.flag{color:var(--orange)}.group-h.flag i{background:var(--orange)}
+.group-h.clear{color:var(--lime)}.group-h.clear i{background:var(--lime)}
 .tallies{display:flex;gap:8px}
 .tally{flex:1;border:2px solid var(--ink);border-radius:16px;padding:8px 10px;display:flex;flex-direction:column;gap:1px;background:#fff}
 .tally.flag{background:var(--orange)}
@@ -299,7 +316,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       <span>Scan a label</span>
       <span class="cta-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </button>
-    <button type="button" class="btn-outline alt" data-go="paste">Paste ingredients instead</button>
+    <button type="button" class="btn-outline alt" data-go="paste">Snap or paste the label instead</button>
   </div>
   <div class="stat">
     <div class="stat-row">
@@ -336,7 +353,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     </div>
     <div class="tabs" role="group" aria-label="Input method">
       <button type="button" class="tab" id="tabScan" data-mode="scan" aria-pressed="true">Scan<span class="tab-x"> barcode</span></button>
-      <button type="button" class="tab" id="tabPaste" data-mode="paste" aria-pressed="false">Paste<span class="tab-x"> ingredients</span></button>
+      <button type="button" class="tab" id="tabPaste" data-mode="paste" aria-pressed="false">Snap<span class="tab-x"> or paste</span></button>
       <button type="button" class="tab" id="tabSearch" data-mode="search" aria-pressed="false">Search</button>
     </div>
   </div>
@@ -379,22 +396,27 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       <input class="input" id="pasteName" type="text" placeholder="Night cream" autocomplete="off" maxlength="60">
     </div>
     <div class="field">
+      <div class="mono-label">STEP 1 · SNAP THE INGREDIENT LIST</div>
+      <label class="snap-btn" for="ocrFile" id="snapBtn">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <span><b>Snap the label</b><small>Easiest. Your photo stays on your phone.</small></span>
+      </label>
+      <input class="sr-only" id="ocrFile" type="file" accept="image/*" capture="environment">
+      <div class="ocr-status" id="ocrStatus" role="status" hidden></div>
+    </div>
+    <div class="or-line"><span>OR PASTE IT</span></div>
+    <div class="field">
       <label class="mono-label" for="pasteText">INGREDIENT LIST</label>
-      <textarea class="input" id="pasteText" rows="5" placeholder="Paste the full list here. Commas, line breaks and &quot;Ingredients:&quot; are all fine."></textarea>
+      <textarea class="input" id="pasteText" rows="4" placeholder="Paste the full list here. Commas, line breaks and &quot;Ingredients:&quot; are all fine."></textarea>
       <div class="paste-meta">
         <div class="count" id="pasteCount">0 ingredients</div>
+        <button type="button" class="mini-link" id="pasteClip" hidden>Paste from clipboard</button>
         <button type="button" class="mini-link" id="tryExample">Try an example</button>
         <button type="button" class="mini-link" id="clearPaste" hidden>Clear</button>
       </div>
-      <div class="paste-acts">
-        <button type="button" class="ghost-pill" id="pasteClip" hidden>Paste</button>
-        <label class="ghost-pill" for="ocrFile">Snap the label</label>
-        <input class="sr-only" id="ocrFile" type="file" accept="image/*" capture="environment">
-      </div>
-      <div class="ocr-status" id="ocrStatus" role="status" hidden></div>
     </div>
-    <div class="err" id="pasteErr" role="alert" hidden>Paste an ingredient list first.</div>
-    <button type="submit" class="btn-primary btn-lime">
+    <div class="err" id="pasteErr" role="alert" hidden>Snap the label or paste an ingredient list first.</div>
+    <button type="submit" class="btn-primary btn-lime" id="checkBtn">
       <span>Check ingredients</span>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
     </button>
@@ -541,6 +563,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     } catch (e) {}
   }
 
+  var CLIP = !!(navigator.clipboard && navigator.clipboard.readText);
   var state = { screen: 'home', mode: 'scan', found: null, items: [], scanCount: 0, shared: false, pendingCode: '' };
   var $ = function (id) { return document.getElementById(id); };
 
@@ -589,6 +612,8 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     if (!flags.length) return 'No flags found in our lists';
     return flags.map(function (f) { return f.ing + ', ' + f.src; }).join('; ');
   }
+  function allSoft(i) { return i.flags.length > 0 && i.flags.every(function (f) { return /lower tier/.test(f.src); }); }
+  function grouped() { return { flagged: state.items.filter(function (i) { return i.flags.length; }), clear: state.items.filter(function (i) { return !i.flags.length; }) }; }
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function totals() {
     var items = state.items;
@@ -701,7 +726,9 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     var pt = $('pasteText'), pn = tokenize(pt.value).length;
     $('pasteCount').textContent = pn ? plural(pn, 'ingredient') + ' found' : 'Nothing pasted yet';
     $('clearPaste').hidden = !pt.value; $('tryExample').hidden = !!pt.value;
-    if (paste && !found) { pt.style.height = 'auto'; pt.style.height = Math.max(150, Math.min(pt.scrollHeight + 4, 300)) + 'px'; }
+    $('pasteForm').classList.toggle('has-text', !!pt.value.trim());
+    if (CLIP) $('pasteClip').hidden = !!pt.value;
+    if (paste && !found) { pt.style.height = 'auto'; pt.style.height = Math.max(110, Math.min(pt.scrollHeight + 4, 300)) + 'px'; }
     if (found) {
       $('foundBadge').textContent = found.badge;
       $('foundName').textContent = found.name;
@@ -756,16 +783,20 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     $('byLine').textContent = 'Scanned ' + plural(items.length, 'product');
     $('totalNum').textContent = t.total;
     $('flagsWord').textContent = t.total === 1 ? 'flag found' : 'flags found';
-    $('splitLine').textContent = t.flagged + ' flagged, ' + t.clean + ' clean on our' + NB + 'lists';
+    $('splitLine').textContent = t.flagged + ' flagged, ' + t.clean + ' with no' + NB + 'flags';
     var rows = $('rows'); rows.textContent = '';
-    items.forEach(function (i) {
-      var row = el('div', 'row'), left = el('div');
-      left.appendChild(el('div', 'name', i.name));
-      left.appendChild(el('div', 'detail', nb(flagText(i.flags))));
-      row.appendChild(left);
-      var allSoft = i.flags.length && i.flags.every(function (f) { return /lower tier/.test(f.src); });
-      row.appendChild(el('div', 'pill ' + (!i.flags.length ? 'clear' : allSoft ? 'flag-soft' : 'flag'), plural(i.flags.length, 'flag')));
-      rows.appendChild(row);
+    var g = grouped();
+    [['FLAGGED', g.flagged, 'flag'], ['NO FLAGS', g.clear, 'clear']].forEach(function (grp) {
+      if (!grp[1].length) return;
+      var h = el('div', 'group-h ' + grp[2]); h.appendChild(el('i')); h.appendChild(el('span', null, grp[0] + ' · ' + grp[1].length)); rows.appendChild(h);
+      grp[1].forEach(function (i) {
+        var row = el('div', 'row'), left = el('div');
+        left.appendChild(el('div', 'name', i.name));
+        if (i.flags.length) left.appendChild(el('div', 'detail', nb(flagText(i.flags))));
+        row.appendChild(left);
+        if (i.flags.length) row.appendChild(el('div', 'pill ' + (allSoft(i) ? 'flag-soft' : 'flag'), plural(i.flags.length, 'flag')));
+        rows.appendChild(row);
+      });
     });
   }
 
@@ -799,28 +830,49 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       x.fillStyle = '#14110F'; x.font = '800 60px ' + D; x.textBaseline = 'alphabetic'; x.fillText('ick check', 70, 125);
       x.fillStyle = '#B9A6FF'; rr(x, 74, 184, 880, 1110, 48); x.fill();
       x.fillStyle = '#14110F'; rr(x, 60, 170, 880, 1110, 48); x.fill();
-      x.fillStyle = '#FFF6E6'; x.font = '800 86px ' + D; x.fillText('My routine', 110, 300); x.fillText('scorecard', 110, 390);
-      x.fillStyle = '#CFC6B6'; x.font = '600 34px ' + D; x.fillText('Scanned ' + plural(state.items.length, 'product'), 110, 450);
-      x.fillStyle = '#2A2420'; rr(x, 110, 495, 780, 230, 36); x.fill();
-      x.fillStyle = '#D7FF3A'; x.font = '800 210px ' + D; x.fillText(String(t.total), 145, 690);
+      x.fillStyle = '#FFF6E6'; x.font = '800 72px ' + D; x.fillText('My routine scorecard', 108, 282);
+      x.fillStyle = '#CFC6B6'; x.font = '600 34px ' + D; x.fillText('Scanned ' + plural(state.items.length, 'product'), 110, 336);
+      x.fillStyle = '#2A2420'; rr(x, 110, 372, 780, 176, 36); x.fill();
+      x.fillStyle = '#D7FF3A'; x.font = '800 160px ' + D; x.fillText(String(t.total), 145, 518);
       var tx = 160 + x.measureText(String(t.total)).width + 30;
-      x.save(); x.translate(tx, 560); x.rotate(-0.05);
+      x.save(); x.translate(tx, 404); x.rotate(-0.05);
       x.font = '800 44px ' + D; var tag = t.total === 1 ? 'flag found' : 'flags found', tw = x.measureText(tag).width;
       x.fillStyle = '#FF9AD0'; rr(x, 0, 0, tw + 36, 66, 14); x.fill();
       x.fillStyle = '#14110F'; x.fillText(tag, 18, 48); x.restore();
       x.fillStyle = '#E8E0D2'; x.font = '600 30px ' + D;
-      x.fillText(fit(x, t.flagged + ' flagged, ' + t.clean + ' clean on our lists', 880 - tx), tx, 680);
-      var y = 800, shown = state.items.slice(0, 5);
-      shown.forEach(function (i) {
-        var pill = plural(i.flags.length, 'flag');
-        x.font = '800 30px ' + D; var pw = x.measureText(pill).width + 36;
-        x.fillStyle = i.flags.length ? '#FF6A3D' : '#D7FF3A'; rr(x, 890 - pw, y - 34, pw, 48, 24); x.fill();
-        x.fillStyle = '#14110F'; x.fillText(pill, 890 - pw + 18, y);
-        x.fillStyle = '#FFF6E6'; x.font = '800 40px ' + D; x.fillText(fit(x, i.name, 760 - pw - 120), 110, y + 4);
-        x.fillStyle = '#CFC6B6'; x.font = '500 28px ' + D; x.fillText(fit(x, flagText(i.flags), 780), 110, y + 46);
-        y += 102;
-      });
-      if (state.items.length > shown.length) { x.fillStyle = '#CFC6B6'; x.font = '600 28px ' + D; x.fillText('+' + (state.items.length - shown.length) + ' more products', 110, y + 4); }
+      x.fillText(fit(x, t.flagged + ' flagged, ' + t.clean + ' with no flags', 880 - tx), tx, 516);
+      /* products listed under FLAGGED and NO FLAGS, fitted to the space above the dashed line */
+      var g = grouped(), F = g.flagged, C = g.clear, y = 606, AVAIL = 580, HH = 46, CR = 49, MORE = 40;
+      var roomy = (F.length ? HH + F.length * 84 : 0) + (C.length ? HH + C.length * CR : 0) <= AVAIL, FR = roomy ? 84 : CR;
+      var reserveC = C.length ? HH + CR + (C.length > 1 ? MORE : 0) : 0;
+      var budF = AVAIL - reserveC - HH, nF = Math.min(F.length, Math.max(0, Math.floor(budF / FR)));
+      while (nF > 0 && nF < F.length && nF * FR + MORE > budF) nF--;
+      var usedF = F.length ? HH + nF * FR + (nF < F.length ? MORE : 0) : 0;
+      var budC = AVAIL - usedF - HH, nC = Math.min(C.length, Math.max(0, Math.floor(budC / CR)));
+      while (nC > 0 && nC < C.length && nC * CR + MORE > budC) nC--;
+      function head(label, n, color) {
+        x.fillStyle = color; x.beginPath(); x.arc(122, y - 9, 9, 0, 6.3); x.fill();
+        x.font = '700 26px ' + M; x.fillText(label + ' · ' + n, 144, y); y += HH;
+      }
+      function more(n) { x.fillStyle = '#CFC6B6'; x.font = '600 26px ' + D; x.fillText('+' + n + ' more', 110, y - 6); y += MORE; }
+      if (F.length) {
+        head('FLAGGED', F.length, '#FF6A3D');
+        F.slice(0, nF).forEach(function (i) {
+          var pill = plural(i.flags.length, 'flag');
+          x.font = '800 28px ' + D; var pw = x.measureText(pill).width + 32;
+          x.fillStyle = allSoft(i) ? '#B9A6FF' : '#FF6A3D'; rr(x, 890 - pw, y - 32, pw, 44, 22); x.fill();
+          x.fillStyle = '#14110F'; x.fillText(pill, 890 - pw + 16, y - 1);
+          x.fillStyle = '#FFF6E6'; x.font = '800 36px ' + D; x.fillText(fit(x, i.name, 760 - pw), 110, y);
+          if (roomy) { x.fillStyle = '#CFC6B6'; x.font = '500 25px ' + D; x.fillText(fit(x, i.flags.map(function (f) { return f.ing; }).join(', '), 780), 110, y + 34); }
+          y += FR;
+        });
+        if (nF < F.length) more(F.length - nF);
+      }
+      if (C.length) {
+        head('NO FLAGS', C.length, '#D7FF3A');
+        C.slice(0, nC).forEach(function (i) { x.fillStyle = '#FFF6E6'; x.font = '800 36px ' + D; x.fillText(fit(x, i.name, 780), 110, y); y += CR; });
+        if (nC < C.length) more(C.length - nC);
+      }
       x.strokeStyle = '#5A5046'; x.lineWidth = 3; x.setLineDash([12, 10]); x.beginPath(); x.moveTo(110, 1195); x.lineTo(890, 1195); x.stroke(); x.setLineDash([]);
       x.fillStyle = '#CFC6B6'; x.font = '500 26px ' + D;
       x.fillText(fit(x, 'Flags come from public lists.', 780), 110, 1238);
@@ -922,7 +974,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
   $('pasteText').addEventListener('input', function () { $('pasteErr').hidden = true; render(); });
   $('tryExample').addEventListener('click', function () { $('pasteText').value = EXAMPLE; $('pasteErr').hidden = true; render(); });
   $('clearPaste').addEventListener('click', function () { $('pasteText').value = ''; ocrStatus(''); render(); $('pasteText').focus(); });
-  if (navigator.clipboard && navigator.clipboard.readText) {
+  if (CLIP) {
     $('pasteClip').hidden = false;
     $('pasteClip').addEventListener('click', function () {
       navigator.clipboard.readText().then(function (t) {
