@@ -22,231 +22,268 @@
    "lists": [
     "I",
     "III"
-   ]
+   ],
+   "role": "UV filter used in some sunscreens"
   },
   {
    "name": "3-Benzylidene camphor",
    "lists": [
     "I"
-   ]
+   ],
+   "role": "UV filter used in some sunscreens"
   },
   {
    "name": "Butylparaben",
    "lists": [
     "I",
     "III"
-   ]
+   ],
+   "role": "preservative that keeps products from spoiling"
   },
   {
    "name": "Isobutylparaben",
    "lists": [
     "I",
     "III"
-   ]
+   ],
+   "role": "preservative that keeps products from spoiling"
   },
   {
    "name": "Dibutyl phthalate",
    "lists": [
     "I"
-   ]
+   ],
+   "role": "plasticizer, historically used in nail polish to keep it flexible"
   },
   {
    "name": "Diethylhexyl phthalate",
    "lists": [
     "I"
-   ]
+   ],
+   "role": "plasticizer, mostly found in plastics and packaging rather than added to formulas on purpose"
   },
   {
    "name": "Benzyl butyl phthalate",
    "lists": [
     "I"
-   ]
+   ],
+   "role": "plasticizer, mostly found in plastics and packaging rather than added to formulas on purpose"
   },
   {
    "name": "Diisobutyl phthalate",
    "lists": [
     "I"
-   ]
+   ],
+   "role": "plasticizer, historically used in nail polish"
   },
   {
    "name": "Dicyclohexyl phthalate",
    "lists": [
     "I",
     "II"
-   ]
+   ],
+   "role": "plasticizer, mostly used in plastics and packaging"
   },
   {
    "name": "Triphenyl phosphate",
    "lists": [
     "I"
-   ]
+   ],
+   "role": "plasticizer used in some nail polishes to keep them flexible"
   },
   {
    "name": "Bisphenol A",
    "lists": [
     "I"
-   ]
+   ],
+   "role": "chemical used to make plastics and packaging, not normally added to formulas on purpose"
   },
   {
    "name": "Nonylphenol ethoxylates (nonoxynols)",
    "lists": [
     "I"
-   ]
+   ],
+   "role": "surfactant and emulsifier that helps oil and water mix"
   },
   {
    "name": "Octylphenol ethoxylates (octoxynols)",
    "lists": [
     "I"
-   ]
+   ],
+   "role": "surfactant and emulsifier that helps oil and water mix"
   },
   {
    "name": "BHA (butylated hydroxyanisole)",
    "lists": [
     "II",
     "III"
-   ]
+   ],
+   "role": "antioxidant that keeps oils and fragrance in a product from going off"
   },
   {
    "name": "BHT (butylated hydroxytoluene)",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "antioxidant that keeps oils and fragrance in a product from going off"
   },
   {
    "name": "Avobenzone",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "UVA filter used in sunscreens"
   },
   {
    "name": "Oxybenzone (benzophenone-3)",
    "lists": [
     "II",
     "III"
-   ]
+   ],
+   "role": "UV filter used in sunscreens"
   },
   {
    "name": "Benzophenone-1",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "UV absorber that protects the product itself, such as nail polish or fragrance, from light"
   },
   {
    "name": "Isoamyl p-methoxycinnamate",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "UVB filter used in sunscreens"
   },
   {
    "name": "Methylparaben",
    "lists": [
     "II",
     "III"
-   ]
+   ],
+   "role": "preservative that keeps products from spoiling"
   },
   {
    "name": "Propylparaben",
    "lists": [
     "II",
     "III"
-   ]
+   ],
+   "role": "preservative that keeps products from spoiling"
   },
   {
    "name": "Triclosan",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "antibacterial ingredient, also used as a preservative"
   },
   {
    "name": "Resorcinol",
    "lists": [
     "II",
     "III"
-   ]
+   ],
+   "role": "hair dye ingredient that helps form the colour, also used in some acne and peel products"
   },
   {
    "name": "Butylphenyl methylpropional (lilial)",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "floral fragrance ingredient"
   },
   {
    "name": "Galaxolide (HHCB)",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "synthetic musk fragrance ingredient"
   },
   {
    "name": "Tonalide (AHTN)",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "synthetic musk fragrance ingredient"
   },
   {
    "name": "OTNE (Iso E Super)",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "woody, amber-like fragrance ingredient"
   },
   {
    "name": "Climbazole",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "anti-dandruff and antifungal ingredient, also used as a preservative"
   },
   {
    "name": "Cyclomethicone",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "silicone that gives products a smooth, silky feel"
   },
   {
    "name": "Cyclopentasiloxane (D5)",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "lightweight silicone that gives a smooth, silky feel and evaporates quickly"
   },
   {
    "name": "Sodium fluoride",
    "lists": [
     "II"
-   ]
+   ],
+   "role": "fluoride used in toothpaste and mouthwash to help protect against cavities"
   },
   {
    "name": "Cyclotetrasiloxane (D4)",
    "lists": [
     "III"
-   ]
+   ],
+   "role": "lightweight silicone that gives a smooth, silky feel"
   },
   {
    "name": "Benzophenone-2",
    "lists": [
     "III"
-   ]
+   ],
+   "role": "UV absorber that protects the product itself, such as a fragrance, from light"
   },
   {
    "name": "Salicylic acid",
    "lists": [
     "III"
-   ]
+   ],
+   "role": "exfoliant used in acne and scalp products, also used as a preservative"
   },
   {
    "name": "Triclocarban",
    "lists": [
     "III"
-   ]
+   ],
+   "role": "antibacterial ingredient used in some bar soaps"
   },
   {
    "name": "Dipentyl phthalate",
    "lists": [
     "III"
-   ]
+   ],
+   "role": "plasticizer, mostly used in plastics rather than added to formulas on purpose"
   },
   {
    "name": "Tricresyl phosphate",
    "lists": [
     "III"
-   ]
+   ],
+   "role": "plasticizer, historically used in some nail polishes"
   }
  ]
 }

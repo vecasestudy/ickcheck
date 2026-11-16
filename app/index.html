@@ -251,6 +251,10 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
 .fr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .fr-name{font-weight:800;font-size:16.5px;line-height:1.2;overflow-wrap:anywhere}
 .fr-tag{flex-shrink:0;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:2px solid var(--ink);border-radius:999px;padding:2px 8px;background:var(--cream)}
+.fr-ai{font-size:13.5px;line-height:1.4;margin-top:8px;padding-top:8px;border-top:1.5px dashed rgba(20,17,15,.35)}
+.ai-tag{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;border:1.5px solid var(--ink);border-radius:999px;padding:1px 6px;background:var(--lime);white-space:nowrap}
+.share-opt{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.35;color:var(--cream);cursor:pointer}
+.share-opt input{width:22px;height:22px;flex-shrink:0;margin:0;accent-color:var(--lime)}
 .fr-desc{font-size:13.5px;line-height:1.35;margin-top:3px;color:var(--muted-light)}
 .rest{border:2px solid var(--ink);border-radius:16px;background:#fff}
 .rest summary{list-style:none;display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:0 14px;font-weight:800;font-size:15.5px;cursor:pointer}
@@ -380,7 +384,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       <button type="submit" class="ghost-pill">Look up</button>
     </form>
     <div class="err" id="scanErr" role="alert" hidden></div>
-    <p class="src">Product data from <a href="https://world.openbeautyfacts.org" target="_blank" rel="noopener">Open Beauty Facts</a>, an open database (ODbL). Flags from the <a href="https://edlists.org" target="_blank" rel="noopener">EU endocrine disruptor lists</a>. <a href="privacy.html">Camera &amp; privacy</a>.</p>
+    <p class="src">Product data from <a href="https://world.openbeautyfacts.org" target="_blank" rel="noopener">Open Beauty Facts</a>, an open database (ODbL), plus INCI API and labels shared by users. Flags from the <a href="https://edlists.org" target="_blank" rel="noopener">EU endocrine disruptor lists</a>. <a href="privacy.html">Camera &amp; privacy</a>.</p>
   </div>
 
   <div class="cam short" id="camShort" hidden>
@@ -415,6 +419,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
         <button type="button" class="mini-link" id="clearPaste" hidden>Clear</button>
       </div>
     </div>
+    <label class="share-opt" id="shareOpt" hidden><input type="checkbox" id="shareLabel" checked><span>Share this label so the next person’s scan finds it. Only the barcode, product name and ingredient list are shared.</span></label>
     <div class="err" id="pasteErr" role="alert" hidden>Snap the label or paste an ingredient list first.</div>
     <button type="submit" class="btn-primary btn-lime" id="checkBtn">
       <span>Check ingredients</span>
@@ -564,6 +569,23 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
   }
 
   var CLIP = !!(navigator.clipboard && navigator.clipboard.readText);
+  /* Ick Check helper (Cloudflare): extra product lookups, shared labels, short AI notes. See worker/. */
+  var API = 'https://api.ickcheck.ai';
+  function api(path, opts, ms) {
+    var ctrl = new AbortController(), t = setTimeout(function () { ctrl.abort(); }, ms || 7000);
+    return fetch(API + path, Object.assign({ signal: ctrl.signal }, opts || {})).then(function (r) { return r.ok ? r.json() : null; })
+      .catch(function () { return null; }).then(function (v) { clearTimeout(t); return v; });
+  }
+  var AI_NOTES = false;   /* turned on once the reviewed notes are approved */
+  var EXPL = {};
+  function explainInto(name, node) {
+    if (!AI_NOTES) return;
+    if (!EXPL[name]) EXPL[name] = api('/explain?name=' + encodeURIComponent(name)).then(function (j) { return (j && j.text) || ''; });
+    EXPL[name].then(function (text) {
+      if (!text || !node.isConnected) return;
+      node.textContent = ''; node.appendChild(el('span', 'ai-tag', 'AI NOTE')); node.appendChild(document.createTextNode(' ' + text)); node.hidden = false;
+    });
+  }
   var state = { screen: 'home', mode: 'scan', found: null, items: [], scanCount: 0, shared: false, pendingCode: '' };
   var $ = function (id) { return document.getElementById(id); };
 
@@ -727,6 +749,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     $('pasteCount').textContent = pn ? plural(pn, 'ingredient') + ' found' : 'Nothing pasted yet';
     $('clearPaste').hidden = !pt.value; $('tryExample').hidden = !!pt.value;
     $('pasteForm').classList.toggle('has-text', !!pt.value.trim());
+    $('shareOpt').hidden = !state.pendingCode;
     if (CLIP) $('pasteClip').hidden = !!pt.value;
     if (paste && !found) { pt.style.height = 'auto'; pt.style.height = Math.max(110, Math.min(pt.scrollHeight + 4, 300)) + 'px'; }
     if (found) {
@@ -743,7 +766,8 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       found.flags.forEach(function (f) {
         var l = LISTS[f.list] || {}, row = el('div', 'flag-row' + (f.list === 'III' ? ' soft' : ''));
         var top = el('div', 'fr-top'); top.appendChild(el('div', 'fr-name', f.ing)); top.appendChild(el('div', 'fr-tag', (l.label || 'EU ED list').replace('EU ED ', '')));
-        row.appendChild(top); row.appendChild(el('div', 'fr-desc', l.desc || '')); fl.appendChild(row);
+        row.appendChild(top); row.appendChild(el('div', 'fr-desc', l.desc || ''));
+        var ai = el('div', 'fr-ai'); ai.hidden = true; row.appendChild(ai); fl.appendChild(row); explainInto(f.ing, ai);
       });
       var note = $('foundNote');
       note.textContent = !found.flags.length ? nb('No flags found on the EU endocrine disruptor lists.') : softN ? nb('Lower tier means one national authority considers it an endocrine disruptor. It has not been identified at EU level.') : '';
@@ -755,7 +779,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       var chips = $('foundChips'); chips.textContent = '';
       others.forEach(function (t) { chips.appendChild(el('div', 'chip', t)); });
       $('againBtn').textContent = scan ? 'Scan again' : search ? 'Search again' : 'Edit ingredients';
-      $('editBtn').hidden = !(found.origin && found.origin.kind === 'obf');
+      $('editBtn').hidden = !(found.origin && /^(obf|inci|community)$/.test(found.origin.kind));
       var src = $('foundSrc'); src.textContent = '';
       if (found.origin && found.origin.kind === 'obf') {
         src.appendChild(document.createTextNode('Ingredients from '));
@@ -763,8 +787,10 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
         src.appendChild(a1);
         src.appendChild(document.createTextNode(' (community data). Check them against your label. '));
       }
+      if (found.origin && found.origin.kind === 'inci') src.appendChild(document.createTextNode('Ingredients from INCI API (third-party data). Check them against your label. '));
+      if (found.origin && found.origin.kind === 'community') src.appendChild(document.createTextNode('Ingredients from a label another Ick Check user shared. Check them against your label. '));
       if (found.origin && (found.origin.kind === 'local' || found.origin.kind === 'saved')) {
-        src.appendChild(document.createTextNode(found.origin.kind === 'local' ? 'From the label you saved on this phone. ' : 'Saved on this phone for your next scan. '));
+        src.appendChild(document.createTextNode(found.origin.kind === 'local' ? 'From the label you saved on this phone. ' : found.origin.shared ? 'Saved on this phone and shared for the next person who scans it. ' : 'Saved on this phone for your next scan. '));
         var a3 = el('a', null, 'Add it to Open Beauty Facts'); a3.href = 'https://world.openbeautyfacts.org/cgi/product.pl?type=search_or_add&action=process&code=' + encodeURIComponent(found.origin.code); a3.target = '_blank'; a3.rel = 'noopener';
         src.appendChild(a3); src.appendChild(document.createTextNode(' so everyone can find it. '));
       }
@@ -990,8 +1016,10 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     var name = $('pasteName').value.trim() || 'Pasted product';
     $('pasteNotice').hidden = true;
     var pc = state.pendingCode;
+    var shared = !!(pc && $('shareLabel').checked && tokens.length >= 3);
     if (pc) { mineSet(pc, name === 'Pasted product' ? '' : name, $('pasteText').value); state.pendingCode = ''; }
-    state.found = analyze($('pasteText').value, name, 'CHECKED', pc ? { kind: 'saved', code: pc } : { kind: 'paste' });
+    if (shared) api('/label', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: pc, name: name === 'Pasted product' ? '' : name, text: tokens.join(', ') }) });
+    state.found = analyze($('pasteText').value, name, 'CHECKED', pc ? { kind: 'saved', code: pc, shared: shared } : { kind: 'paste' });
     render();
   });
 
@@ -1124,10 +1152,19 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       state.found = analyze(ing, pname || ('Product ' + code), 'FOUND IT', { kind: 'obf', code: product.code || code, url: 'https://world.openbeautyfacts.org/product/' + (product.code || code) });
       render(); return;
     }
+    cam.label = 'CHECKING MORE SOURCES'; render();
+    var extra = await api('/lookup?code=' + encodeURIComponent(code));
+    cam.label = 'POINT AT THE BARCODE';
+    if (extra && extra.ingredients && extra.ingredients.length > 10) {
+      state.found = analyze(extra.ingredients, (extra.name || pname || ('Product ' + code)).slice(0, 60), 'FOUND IT', { kind: extra.source === 'community' ? 'community' : 'inci', code: extra.code || code });
+      render(); return;
+    }
+    if (!pname && extra && extra.name) pname = extra.name;
+    var known = !!(product || (extra && extra.name));
     state.mode = 'paste'; state.found = null; state.pendingCode = code;
-    $('pasteName').value = pname.slice(0, 60);
+    $('pasteName').value = pname.slice(0, 60); $('pasteText').value = ''; ocrStatus(''); $('shareLabel').checked = true;
     var n = $('pasteNotice');
-    n.textContent = (product ? 'Found ' + (pname || 'this product') + ', but not its ingredient list yet. ' : 'Barcode ' + code + ' isn’t in the open database yet. ') + 'Snap or paste the ingredient list from the back of the bottle. We’ll remember it on this phone for next time.';
+    n.textContent = (known ? 'Found ' + (pname || 'this product') + ', but not its ingredient list yet. ' : 'We don’t have barcode ' + code + ' yet. ') + 'Snap the ingredient list on the back of the bottle and we’ll check it. We’ll remember it for next time.';
     n.hidden = false;
     render();
   }

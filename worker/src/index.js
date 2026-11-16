@@ -50,7 +50,7 @@ async function fetchJson(url, init, ms = 6000) {
 async function inci(env, code, trace) {
   const apiKey = env.INCI_KEY || env['INCI-KEY'];
   if (!apiKey) { if (trace) trace.push('inci: no key set'); return null; }
-  const hit = trace ? null : await getJ(env, 'inci:' + code);
+  const hit = trace ? null : await getJ(env, 'inci2:' + code);
   if (hit) return hit.miss ? null : hit;
   const month = new Date().toISOString().slice(0, 7);
   if (!(await underCap(env, 'cap:inci:' + month, Number(env.INCI_MONTHLY_CAP) || 1900, 40 * DAY))) { if (trace) trace.push('inci: monthly cap reached'); return null; }
@@ -60,9 +60,10 @@ async function inci(env, code, trace) {
   const p = r.body && r.body.product;
   const list = p && p.details && Array.isArray(p.details.inci) ? p.details.inci.join(', ') : '';
   const ingredients = String((p && p.ingredients) || list || '').slice(0, 4000);
-  if (!p || !ingredients) { await putJ(env, 'inci:' + code, { miss: true }, 7 * DAY); return null; }
-  const out = { name: [p.brand, p.name].filter(Boolean).join(' ').slice(0, 120), ingredients };
-  await putJ(env, 'inci:' + code, out, 60 * DAY);
+  if (!p || !ingredients) { await putJ(env, 'inci2:' + code, { miss: true }, 7 * DAY); return null; }
+  const nm = String(p.name || '').trim(), br = String(p.brand || '').trim();
+  const out = { name: (br && !nm.toLowerCase().startsWith(br.toLowerCase()) ? br + ' ' + nm : nm).slice(0, 120), ingredients };
+  await putJ(env, 'inci2:' + code, out, 60 * DAY);
   return out;
 }
 async function upcName(env, code, trace) {
@@ -110,7 +111,8 @@ async function explain(req, env, url) {
   const f = FLAGS.get(String(url.searchParams.get('name') || '').toLowerCase());
   if (!f) return json(req, { error: 'unknown_ingredient' }, 404);       // only flagged ingredients, never free-form questions
   const tier = ORDER.find(l => f.lists.includes(l)) || 'III', list = DATA.lists[tier];
-  const key = 'explain:v1:' + f.name.toLowerCase();
+  if (!f.role) return json(req, { name: f.name, text: '' });
+  const key = 'explain:v2:' + f.name.toLowerCase();
   const hit = await getJ(env, key);
   if (hit) return json(req, { name: f.name, text: hit.text, ai: true }, 200, DAY);
   if (!env.AI || !(await underCap(env, 'cap:ai:' + new Date().toISOString().slice(0, 10), Number(env.AI_DAILY_CAP) || 60, 2 * DAY))) return json(req, { name: f.name, text: '' });
@@ -119,8 +121,8 @@ async function explain(req, env, url) {
     const r = await env.AI.run(MODEL, {
       max_tokens: 110, temperature: 0.2,
       messages: [
-        { role: 'system', content: 'You write short, calm notes for shoppers reading a cosmetics label. Write exactly two plain sentences, 45 words at most in total. Sentence one: what this ingredient typically does in beauty or personal care products. Sentence two: restate its regulatory status using only the status given to you. Do not give medical advice, do not say it is safe or unsafe, do not mention diseases, do not tell the reader what to do, and do not add facts about its status beyond what is given. No lists, no emojis, no headings.' },
-        { role: 'user', content: 'Ingredient: ' + f.name + '\nStatus: on ' + list.label + ' (' + list.desc + ').' }
+        { role: 'system', content: 'You write short, calm notes for shoppers reading a cosmetics label. Write exactly two plain sentences, 45 words at most in total. Sentence one: say what this ingredient does, using only the role given to you; do not add any other use, product type or benefit. Sentence two: restate its regulatory status using only the status given to you. Do not give medical advice, do not say it is safe or unsafe, do not mention diseases, do not tell the reader what to do, and do not add any fact that is not in the role or status given. No lists, no emojis, no headings.' },
+        { role: 'user', content: 'Ingredient: ' + f.name + '\nRole: ' + f.role + '\nStatus: on ' + list.label + ' (' + list.desc + ').' }
       ]
     });
     text = String((r && r.response) || '').replace(/\s+/g, ' ').replace(/^["']|["']$/g, '').trim();
