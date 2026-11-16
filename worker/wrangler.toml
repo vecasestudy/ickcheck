@@ -1,0 +1,28 @@
+# Ick Check helper: runs on Cloudflare's free plan.
+name = "ickcheck-api"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+# Serves the helper at https://api.ickcheck.ai
+routes = [{ pattern = "api.ickcheck.ai", custom_domain = true }]
+
+# Small key-value store for cached lookups, shared labels and AI explanations.
+[[kv_namespaces]]
+binding = "STORE"
+
+# Free AI allowance (10,000 "neurons" a day on the free plan).
+[ai]
+binding = "AI"
+
+# Stops any one visitor from hammering the helper.
+[[ratelimits]]
+name = "LIMIT"
+namespace_id = "1001"
+simple = { limit = 30, period = 60 }
+
+[vars]
+INCI_MONTHLY_CAP = "1900"   # INCI API free tier is 2,000 a month
+AI_DAILY_CAP = "60"         # most explanations are written once, then reused
+
+[observability]
+enabled = true

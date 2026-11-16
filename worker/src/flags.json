@@ -1,0 +1,252 @@
+{
+ "lists": {
+  "I": {
+   "label": "EU ED List I",
+   "desc": "Identified as an endocrine disruptor at EU level",
+   "url": "https://edlists.org/the-ed-lists/list-i-substances-identified-as-endocrine-disruptors-by-the-eu"
+  },
+  "II": {
+   "label": "EU ED List II",
+   "desc": "Under EU evaluation for endocrine disruption",
+   "url": "https://edlists.org/the-ed-lists/list-ii-substances-under-eu-investigation-endocrine-disruption"
+  },
+  "III": {
+   "label": "EU ED List III",
+   "desc": "Considered an endocrine disruptor by a national authority",
+   "url": "https://edlists.org/the-ed-lists/list-iii-substances-identified-as-endocrine-disruptors-by-participating-national-authorities"
+  }
+ },
+ "flags": [
+  {
+   "name": "4-Methylbenzylidene camphor",
+   "lists": [
+    "I",
+    "III"
+   ]
+  },
+  {
+   "name": "3-Benzylidene camphor",
+   "lists": [
+    "I"
+   ]
+  },
+  {
+   "name": "Butylparaben",
+   "lists": [
+    "I",
+    "III"
+   ]
+  },
+  {
+   "name": "Isobutylparaben",
+   "lists": [
+    "I",
+    "III"
+   ]
+  },
+  {
+   "name": "Dibutyl phthalate",
+   "lists": [
+    "I"
+   ]
+  },
+  {
+   "name": "Diethylhexyl phthalate",
+   "lists": [
+    "I"
+   ]
+  },
+  {
+   "name": "Benzyl butyl phthalate",
+   "lists": [
+    "I"
+   ]
+  },
+  {
+   "name": "Diisobutyl phthalate",
+   "lists": [
+    "I"
+   ]
+  },
+  {
+   "name": "Dicyclohexyl phthalate",
+   "lists": [
+    "I",
+    "II"
+   ]
+  },
+  {
+   "name": "Triphenyl phosphate",
+   "lists": [
+    "I"
+   ]
+  },
+  {
+   "name": "Bisphenol A",
+   "lists": [
+    "I"
+   ]
+  },
+  {
+   "name": "Nonylphenol ethoxylates (nonoxynols)",
+   "lists": [
+    "I"
+   ]
+  },
+  {
+   "name": "Octylphenol ethoxylates (octoxynols)",
+   "lists": [
+    "I"
+   ]
+  },
+  {
+   "name": "BHA (butylated hydroxyanisole)",
+   "lists": [
+    "II",
+    "III"
+   ]
+  },
+  {
+   "name": "BHT (butylated hydroxytoluene)",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "Avobenzone",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "Oxybenzone (benzophenone-3)",
+   "lists": [
+    "II",
+    "III"
+   ]
+  },
+  {
+   "name": "Benzophenone-1",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "Isoamyl p-methoxycinnamate",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "Methylparaben",
+   "lists": [
+    "II",
+    "III"
+   ]
+  },
+  {
+   "name": "Propylparaben",
+   "lists": [
+    "II",
+    "III"
+   ]
+  },
+  {
+   "name": "Triclosan",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "Resorcinol",
+   "lists": [
+    "II",
+    "III"
+   ]
+  },
+  {
+   "name": "Butylphenyl methylpropional (lilial)",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "Galaxolide (HHCB)",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "Tonalide (AHTN)",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "OTNE (Iso E Super)",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "Climbazole",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "Cyclomethicone",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "Cyclopentasiloxane (D5)",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "Sodium fluoride",
+   "lists": [
+    "II"
+   ]
+  },
+  {
+   "name": "Cyclotetrasiloxane (D4)",
+   "lists": [
+    "III"
+   ]
+  },
+  {
+   "name": "Benzophenone-2",
+   "lists": [
+    "III"
+   ]
+  },
+  {
+   "name": "Salicylic acid",
+   "lists": [
+    "III"
+   ]
+  },
+  {
+   "name": "Triclocarban",
+   "lists": [
+    "III"
+   ]
+  },
+  {
+   "name": "Dipentyl phthalate",
+   "lists": [
+    "III"
+   ]
+  },
+  {
+   "name": "Tricresyl phosphate",
+   "lists": [
+    "III"
+   ]
+  }
+ ]
+}
