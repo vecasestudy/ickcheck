@@ -61,6 +61,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 }
 @media (max-width:360px){:root{--gutter:16px}.tab{font-size:13.5px;padding:0 4px}.share-act{font-size:12.5px}.share-act .circ{width:52px;height:52px}}
 .tab{white-space:nowrap}
+@media (max-width:380px){.tab-x{display:none}}
 .screen{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .pad{min-height:100%;padding:calc(24px + var(--safe-top)) var(--gutter) calc(28px + var(--safe-bottom));display:flex;flex-direction:column}
 
@@ -142,7 +143,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .input:focus{border-color:var(--lime)}
 .input::placeholder{color:#8F8575}
 input.input{min-height:52px;padding:0 16px;font-weight:600;font-size:17px}
-textarea.input{height:200px;padding:14px 16px;resize:none;font-family:var(--mono);font-size:16px;line-height:1.5}
+textarea.input{height:150px;padding:14px 16px;resize:none;font-weight:600;font-size:16px;line-height:1.45;display:block}
 .paste-meta{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .paste-meta .count{font-family:var(--mono);font-size:12px;color:var(--muted-dark)}
 .ghost-pill{min-height:44px;padding:0 16px;border:2px solid var(--cream);background:transparent;color:var(--cream);border-radius:999px;font-weight:600;font-size:14px}
@@ -217,9 +218,29 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
 .notice{border:2px solid var(--lime);border-radius:16px;padding:12px 14px;font-size:15px;line-height:1.4;color:var(--cream)}
 .ocr-status{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--lime);line-height:1.5}
 .note{white-space:pre-line}
-.paste-meta{flex-wrap:wrap}
 .paste-meta .count{white-space:nowrap}
-.paste-meta .btns{display:flex;gap:8px;flex-wrap:nowrap;margin-left:auto}
+.mini-link{min-height:44px;margin:-10px 0;padding:0 2px;border:none;background:transparent;color:var(--cream);font-weight:600;font-size:14px;text-decoration:underline}
+.paste-acts{display:flex;gap:10px}
+.paste-acts .ghost-pill{flex:1;display:inline-flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer}
+.tallies{display:flex;gap:8px}
+.tally{flex:1;border:2px solid var(--ink);border-radius:16px;padding:8px 10px;display:flex;flex-direction:column;gap:1px;background:#fff}
+.tally.flag{background:var(--orange)}
+.tally.flag-soft{background:var(--lilac);border-style:dashed}
+.tally b{font-weight:800;font-size:24px;line-height:1;letter-spacing:-.02em}
+.tally span{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.flag-list{display:flex;flex-direction:column;gap:8px}
+.flag-row{border:2px solid var(--ink);border-radius:16px;padding:10px 14px;background:var(--peach)}
+.flag-row.soft{background:#EEE8FF;border-style:dashed}
+.fr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.fr-name{font-weight:800;font-size:16.5px;line-height:1.2;overflow-wrap:anywhere}
+.fr-tag{flex-shrink:0;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:2px solid var(--ink);border-radius:999px;padding:2px 8px;background:var(--cream)}
+.fr-desc{font-size:13.5px;line-height:1.35;margin-top:3px;color:var(--muted-light)}
+.rest{border:2px solid var(--ink);border-radius:16px;background:#fff}
+.rest summary{list-style:none;display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:0 14px;font-weight:800;font-size:15.5px;cursor:pointer}
+.rest summary::-webkit-details-marker{display:none}
+.rest[open] summary svg{transform:rotate(180deg)}
+.rest .chips{padding:2px 12px 14px}
+.rest .chip{font-size:13.5px;padding:4px 10px;border-width:1.5px;overflow-wrap:anywhere}
 .btn-link.on-cream{color:var(--ink);align-self:center}
 
 /* Search and in-app browser notice */
@@ -314,8 +335,8 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       <div class="spacer44"></div>
     </div>
     <div class="tabs" role="group" aria-label="Input method">
-      <button type="button" class="tab" id="tabScan" data-mode="scan" aria-pressed="true">Scan barcode</button>
-      <button type="button" class="tab" id="tabPaste" data-mode="paste" aria-pressed="false">Paste ingredients</button>
+      <button type="button" class="tab" id="tabScan" data-mode="scan" aria-pressed="true">Scan<span class="tab-x"> barcode</span></button>
+      <button type="button" class="tab" id="tabPaste" data-mode="paste" aria-pressed="false">Paste<span class="tab-x"> ingredients</span></button>
       <button type="button" class="tab" id="tabSearch" data-mode="search" aria-pressed="false">Search</button>
     </div>
   </div>
@@ -359,14 +380,16 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     </div>
     <div class="field">
       <label class="mono-label" for="pasteText">INGREDIENT LIST</label>
-      <textarea class="input" id="pasteText" placeholder="Water, Glycerin, Shea Butter..."></textarea>
+      <textarea class="input" id="pasteText" rows="5" placeholder="Paste the full list here. Commas, line breaks and &quot;Ingredients:&quot; are all fine."></textarea>
       <div class="paste-meta">
         <div class="count" id="pasteCount">0 ingredients</div>
-        <div class="btns">
-          <label class="ghost-pill" for="ocrFile">Snap the label</label>
-          <input class="sr-only" id="ocrFile" type="file" accept="image/*" capture="environment">
-          <button type="button" class="ghost-pill" id="tryExample">Try an example</button>
-        </div>
+        <button type="button" class="mini-link" id="tryExample">Try an example</button>
+        <button type="button" class="mini-link" id="clearPaste" hidden>Clear</button>
+      </div>
+      <div class="paste-acts">
+        <button type="button" class="ghost-pill" id="pasteClip" hidden>Paste</button>
+        <label class="ghost-pill" for="ocrFile">Snap the label</label>
+        <input class="sr-only" id="ocrFile" type="file" accept="image/*" capture="environment">
       </div>
       <div class="ocr-status" id="ocrStatus" role="status" hidden></div>
     </div>
@@ -399,8 +422,13 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       </div>
       <div class="found-count"><span id="foundCount"></span><br>checked</div>
     </div>
-    <div class="chips" id="foundChips"></div>
+    <div class="tallies" id="foundSum"></div>
+    <div class="flag-list" id="foundFlags"></div>
     <div class="note" id="foundNote"></div>
+    <details class="rest" id="foundRest">
+      <summary><span id="restSum"></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="chips" id="foundChips"></div>
+    </details>
     <p class="src" id="foundSrc"></p>
     <div class="stack" style="gap:10px;margin-top:2px">
       <button type="button" class="btn-primary add" id="addBtn">
@@ -519,7 +547,44 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
   /* ---------- helpers ---------- */
   function nb(str) { var i = str.lastIndexOf(' '); return i < 0 ? str : str.slice(0, i) + NB + str.slice(i + 1); }
   function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
-  function tokenize(t) { return (t || '').split(/[,;\n]+/).map(function (s) { return s.trim(); }).filter(Boolean); }
+  /* Turns a pasted or photographed ingredient list into clean ingredient names. */
+  var KEEP_CAPS = /^(BHT|BHA|EDTA|PEG|PPG|CI|PCA|SD|DMDM|MEA|TEA|DEA|PVP|VP|HCL|AHA|PHA|SPF|MIPA|DNA|II|III|IV)$/;
+  function tidyCase(s) {
+    return s.toLowerCase().replace(/[a-z][a-z']*/g, function (w) { var u = w.toUpperCase(); return KEEP_CAPS.test(u) ? u : w.charAt(0).toUpperCase() + w.slice(1); });
+  }
+  function tokenize(t) {
+    t = String(t || '').replace(/\r/g, '').replace(/[  -​]/g, ' ');
+    var head = t.match(/((?:(?:in)?active\s+|other\s+|key\s+|full\s+)?ingr[eé]dients?|inci|composition)(\s*\([^)]{0,40}\))?\s*[:\-–]/i);
+    if (head && head.index < 300) t = t.slice(head.index + head[0].length);
+    /* later headers such as "Inactive Ingredients:" just separate two parts of the same list */
+    t = t.replace(/[.\s]*\b(?:(?:in)?active|other|key)\s+ingredients?\s*[:\-\u2013]/gi, ', ');
+    /* footnotes such as "*Certified organic." are not ingredients */
+    t = t.replace(/(^|[.\n])\s*[*†‡]+\s*([^,;\n.]{3,90})(?:\.|\n|$)/g, function (all, pre, body) {
+      return /organic|certif|natural|origin|fair ?trade|essential oil|denotes|derived|biologi|issu/i.test(body) ? pre + ' ' : all;
+    });
+    t = t.replace(/\b(may contain|peut contenir)\b\s*[:\-]?|\[?\s*\+\s*\/\s*-\s*:?/gi, ', ').replace(/[\[\]]/g, ' ');
+    t = t.replace(/([a-z])-\n([a-z])/g, '$1$2');
+    t = (t.split(',').length > 2) ? t.replace(/\n+/g, ' ') : t.replace(/\n+/g, ',');
+    t = t.replace(/[•·●▪|]/g, ',');
+    var parts = [], cur = '', depth = 0, i, c;
+    for (i = 0; i < t.length; i++) {
+      c = t.charAt(i);
+      if (c === '(') depth++; else if (c === ')') depth = Math.max(0, depth - 1);
+      if (cur.length > 90) depth = 0;
+      var numeric = c === ',' && /\d/.test(t.charAt(i - 1)) && /\d/.test(t.charAt(i + 1));
+      if ((c === ',' || c === ';') && depth === 0 && !numeric) { parts.push(cur); cur = ''; } else cur += c;
+    }
+    parts.push(cur);
+    var letters = t.replace(/[^A-Za-z]/g, ''), shout = letters.length > 12 && letters.replace(/[^A-Z]/g, '').length / letters.length > 0.7;
+    var seen = {}, out = [];
+    parts.forEach(function (s) {
+      s = s.replace(/[*†‡]+/g, '').replace(/\s+/g, ' ').replace(/^\s*(and|et)\s+/i, '').replace(/^[\s.:\-]+|[\s.:]+$/g, '');
+      if (s.length < 2 || s.length > 70 || !/[A-Za-z]/.test(s)) return;
+      if (shout) s = tidyCase(s);
+      var k = s.toLowerCase(); if (seen[k]) return; seen[k] = 1; out.push(s);
+    });
+    return out;
+  }
   function flagText(flags) {
     if (!flags.length) return 'No flags found in our lists';
     return flags.map(function (f) { return f.ing + ', ' + f.src; }).join('; ');
@@ -583,9 +648,8 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
   function analyze(text, name, badge, origin) {
     var tokens = tokenize(text);
     var flags = findFlags(text);
-    var others = tokens.filter(function (t) { return !isFlagged(t); }).map(function (t) { t = t.replace(/[.]+$/, ''); return t.charAt(0).toUpperCase() + t.slice(1); }).filter(Boolean);
-    var shown = others.slice(0, 3);
-    var f = buildFound(name, badge, flags, shown, others.length - shown.length, tokens.length);
+    var others = tokens.filter(function (t) { return !isFlagged(t); }).map(function (t) { return t.charAt(0).toUpperCase() + t.slice(1); });
+    var f = buildFound(name, badge, flags, others, 0, tokens.length);
     f.text = text; f.origin = origin;
     return f;
   }
@@ -602,7 +666,7 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
       lines.push(nb('One national authority considers ' + (soft.length === 1 ? 'it' : 'these') + ' an endocrine disruptor. ' + (soft.length === 1 ? 'It has' : 'They have') + ' not been identified at EU level.'));
     }
     var note = flags.length ? lines.join('\n') : nb('No flags found on the EU endocrine disruptor lists.');
-    return { name: name, badge: badge, flags: flags, chips: chips, count: checked + ' ingredients', note: note, softOnly: flags.length > 0 && !strong.length };
+    return { name: name, badge: badge, flags: flags, chips: chips, others: others, count: plural(checked, 'ingredient'), note: note, softOnly: flags.length > 0 && !strong.length };
   }
 
   /* ---------- render ---------- */
@@ -634,15 +698,35 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
     $('pasteForm').hidden = !(paste && !found);
     $('searchForm').hidden = !(search && !found);
     $('drawer').hidden = !found;
-    $('pasteCount').textContent = plural(tokenize($('pasteText').value).length, 'ingredient');
+    var pt = $('pasteText'), pn = tokenize(pt.value).length;
+    $('pasteCount').textContent = pn ? plural(pn, 'ingredient') + ' found' : 'Nothing pasted yet';
+    $('clearPaste').hidden = !pt.value; $('tryExample').hidden = !!pt.value;
+    if (paste && !found) { pt.style.height = 'auto'; pt.style.height = Math.max(150, Math.min(pt.scrollHeight + 4, 300)) + 'px'; }
     if (found) {
       $('foundBadge').textContent = found.badge;
       $('foundName').textContent = found.name;
       $('foundCount').textContent = found.count;
+      var strongN = found.flags.filter(function (f) { return f.list !== 'III'; }).length, softN = found.flags.length - strongN, others = found.others || [];
+      var sum = $('foundSum'); sum.textContent = '';
+      [[strongN, 'flagged', 'flag'], [softN, 'lower tier', 'flag-soft'], [others.length, 'no flags', '']].forEach(function (x) {
+        if (!x[0] && x[2]) return;
+        var b = el('div', 'tally ' + x[2]); b.appendChild(el('b', null, String(x[0]))); b.appendChild(el('span', null, x[1])); sum.appendChild(b);
+      });
+      var fl = $('foundFlags'); fl.textContent = ''; fl.hidden = !found.flags.length;
+      found.flags.forEach(function (f) {
+        var l = LISTS[f.list] || {}, row = el('div', 'flag-row' + (f.list === 'III' ? ' soft' : ''));
+        var top = el('div', 'fr-top'); top.appendChild(el('div', 'fr-name', f.ing)); top.appendChild(el('div', 'fr-tag', (l.label || 'EU ED list').replace('EU ED ', '')));
+        row.appendChild(top); row.appendChild(el('div', 'fr-desc', l.desc || '')); fl.appendChild(row);
+      });
+      var note = $('foundNote');
+      note.textContent = !found.flags.length ? nb('No flags found on the EU endocrine disruptor lists.') : softN ? nb('Lower tier means one national authority considers it an endocrine disruptor. It has not been identified at EU level.') : '';
+      note.hidden = !note.textContent;
+      note.className = 'note ' + (found.flags.length ? 'soft' : 'clear');
+      var rest = $('foundRest'); rest.hidden = !others.length;
+      $('restSum').textContent = (found.flags.length ? 'Everything else' : 'All ingredients') + ' (' + others.length + ')';
+      if (rest.getAttribute('data-for') !== found.text) { rest.open = others.length <= 6; rest.setAttribute('data-for', found.text || ''); }
       var chips = $('foundChips'); chips.textContent = '';
-      found.chips.forEach(function (c) { chips.appendChild(el('div', 'chip' + (c.flag ? (c.soft ? ' flag-soft' : ' flag') : ''), c.text)); });
-      var note = $('foundNote'); note.textContent = found.note;
-      note.className = 'note ' + (found.softOnly ? 'soft' : found.flags.length ? 'flag' : 'clear');
+      others.forEach(function (t) { chips.appendChild(el('div', 'chip', t)); });
       $('againBtn').textContent = scan ? 'Scan again' : search ? 'Search again' : 'Edit ingredients';
       $('editBtn').hidden = !(found.origin && found.origin.kind === 'obf');
       var src = $('foundSrc'); src.textContent = '';
@@ -837,6 +921,15 @@ label.ghost-pill:focus-within{outline:3px solid var(--lilac);outline-offset:2px}
 
   $('pasteText').addEventListener('input', function () { $('pasteErr').hidden = true; render(); });
   $('tryExample').addEventListener('click', function () { $('pasteText').value = EXAMPLE; $('pasteErr').hidden = true; render(); });
+  $('clearPaste').addEventListener('click', function () { $('pasteText').value = ''; ocrStatus(''); render(); $('pasteText').focus(); });
+  if (navigator.clipboard && navigator.clipboard.readText) {
+    $('pasteClip').hidden = false;
+    $('pasteClip').addEventListener('click', function () {
+      navigator.clipboard.readText().then(function (t) {
+        if (t && t.trim()) { $('pasteText').value = t.trim(); $('pasteErr').hidden = true; render(); }
+      }, function () { $('pasteText').focus(); });
+    });
+  }
 
   $('pasteForm').addEventListener('submit', function (e) {
     e.preventDefault();
