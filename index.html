@@ -27,6 +27,36 @@ a { color: inherit; }
 h1, h2, h3, h4, p, li, span, td, th { overflow-wrap: anywhere; }
 a:hover { text-decoration-thickness: 3px; }
 a:focus-visible { outline: 3px solid #B9A6FF; outline-offset: 3px; }
+.hdr-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0 10px; }
+.hdr-logo { order: 1; flex: 0 0 auto; margin-right: auto; }
+.hdr-cta { order: 2; flex: 0 0 auto; white-space: nowrap; }
+.hdr-burger { order: 3; flex: 0 0 auto; width: 48px; height: 48px; padding: 0; border: 3px solid #14110F; border-radius: 14px; background: #FFF6E6; color: #14110F; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.hdr-burger svg { display: block; }
+.hdr-burger .x { display: none; }
+.hdr-burger[aria-expanded="true"] .bars { display: none; }
+.hdr-burger[aria-expanded="true"] .x { display: block; }
+.hdr-nav { order: 4; flex: 1 1 100%; display: none; flex-direction: column; gap: 0; margin-top: 12px; border: 3px solid #14110F; border-radius: 16px; background: #FFF6E6; box-shadow: 4px 4px 0 #B9A6FF; overflow: hidden; }
+.hdr-nav.open { display: flex; }
+.hdr-nav a { font-weight: 600; font-size: 18px; min-height: 52px; display: flex; align-items: center; padding: 0 20px; text-decoration: none; }
+.hdr-nav a + a { border-top: 2px solid #14110F; }
+@media (max-width: 639px) {
+  .hdr-cta { display: none !important; }
+}
+@media (max-width: 420px) {
+  .hdr-logo { gap: 6px !important; }
+  .hdr-logo span:first-child { width: 30px !important; height: 30px !important; }
+  .hdr-logo svg { width: 14px !important; height: 14px !important; }
+  .hdr-logo span:last-child { font-size: 22px !important; }
+}
+@media (min-width: 1000px) {
+  .hdr-row { flex-wrap: nowrap; gap: 0 32px; }
+  .hdr-logo { margin-right: 0; }
+  .hdr-burger { display: none; }
+  .hdr-nav { order: 2; display: flex !important; flex: 1 1 auto; flex-direction: row; justify-content: center; gap: 4px 24px; margin-top: 0; border: 0; border-radius: 0; background: none; box-shadow: none; overflow: visible; }
+  .hdr-nav a { font-size: 16px; min-height: 44px; padding: 0; }
+  .hdr-nav a + a { border-top: 0; }
+  .hdr-cta { order: 3; }
+}
 </style>
 </head>
 <body>
@@ -36,22 +66,22 @@ a:focus-visible { outline: 3px solid #B9A6FF; outline-offset: 3px; }
 
   <!-- NAV + HERO -->
   <header style="background: #FFF6E6">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 24px clamp(16px, 4vw, 48px) 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px">
-      <a href="#top" aria-label="Ick Check home" style="display: flex; align-items: center; gap: 10px; text-decoration: none; min-height: 44px">
+    <div class="hdr-row" style="max-width: 1200px; margin: 0 auto; padding: 24px clamp(16px, 4vw, 48px) 0">
+      <a href="#top" class="hdr-logo" aria-label="Ick Check home" style="display: flex; align-items: center; gap: 10px; text-decoration: none; min-height: 44px">
         <span style="width: 38px; height: 38px; border-radius: 50%; background: #D7FF3A; border: 3px solid #14110F; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14110F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c3 4 6 6.5 6 10.5a6 6 0 0 1-12 0C6 9.5 9 7 12 3z"></path></svg>
         </span>
         <span style="font-weight: 800; font-size: 30px; letter-spacing: -0.03em">ick check</span>
       </a>
-      <nav aria-label="Page sections" style="display: flex; flex-wrap: wrap; gap: 4px 24px">
+      <a href="app/" class="hdr-cta" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 16px; background: #14110F; color: #FFF6E6; font-weight: 800; font-size: 17px; text-decoration: none; box-shadow: 4px 4px 0 #B9A6FF">Try Ick Check</a>
+      <button type="button" class="hdr-burger" id="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menu"><svg class="bars" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"></path></svg><svg class="x" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"></path></svg></button>
+      <nav aria-label="Page sections" class="hdr-nav" id="site-nav">
         <a href="#what-it-does" style="font-weight: 600; font-size: 16px; min-height: 44px; display: flex; align-items: center">What it does</a>
         <a href="#background" style="font-weight: 600; font-size: 16px; min-height: 44px; display: flex; align-items: center">Background</a>
         <a href="#journey" style="font-weight: 600; font-size: 16px; min-height: 44px; display: flex; align-items: center">User Journey</a>
         <a href="#competitors" style="font-weight: 600; font-size: 16px; min-height: 44px; display: flex; align-items: center">Competitors</a>
         <a href="#metrics" style="font-weight: 600; font-size: 16px; min-height: 44px; display: flex; align-items: center">Metrics</a>
-        <a href="#next-steps" style="font-weight: 600; font-size: 16px; min-height: 44px; display: flex; align-items: center">Next Steps</a>
       </nav>
-      <a href="app/" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 16px; background: #14110F; color: #FFF6E6; font-weight: 800; font-size: 17px; text-decoration: none; box-shadow: 4px 4px 0 #B9A6FF">Try Ick Check</a>
     </div>
 
     <div id="top" style="max-width: 1200px; margin: 0 auto; padding: clamp(48px, 7vw, 96px) clamp(16px, 4vw, 48px) clamp(64px, 9vw, 120px); display: flex; flex-wrap: wrap; align-items: center; gap: 48px">
@@ -286,7 +316,7 @@ a:focus-visible { outline: 3px solid #B9A6FF; outline-offset: 3px; }
 
         <div style="flex: 1 1 320px; min-width: 0; background: #FF6A3D; border: 4px solid #14110F; border-radius: 32px; padding: clamp(24px, 3vw, 36px); display: flex; flex-direction: column; gap: 20px">
           <h3 style="font-family: 'Space Mono', ui-monospace, monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.3">Guardrail</h3>
-          <p style="font-weight: 800; font-size: clamp(30px, 3.2vw, 42px); line-height: 1.05; letter-spacing: -0.035em">Latency/Timeouts</p>
+          <p style="font-weight: 800; font-size: clamp(30px, 3.2vw, 42px); line-height: 1.05; letter-spacing: -0.035em">Latency</p>
         </div>
       </div>
     </div>
@@ -335,5 +365,13 @@ a:focus-visible { outline: 3px solid #B9A6FF; outline-offset: 3px; }
 
 </div>
 
+<script>
+(function(){var b=document.getElementById('nav-toggle'),n=document.getElementById('site-nav');if(!b||!n)return;
+function set(o){n.classList.toggle('open',o);b.setAttribute('aria-expanded',o?'true':'false');}
+b.addEventListener('click',function(){set(!n.classList.contains('open'));});
+n.addEventListener('click',function(e){if(e.target.closest('a'))set(false);});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')set(false);});
+})();
+</script>
 </body>
 </html>
