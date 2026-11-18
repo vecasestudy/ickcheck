@@ -20,6 +20,12 @@ name = "LIMIT"
 namespace_id = "1001"
 simple = { limit = 30, period = 60 }
 
+# Tighter limit for saving shared labels (the only place visitors send free text).
+[[ratelimits]]
+name = "LABEL_LIMIT"
+namespace_id = "1002"
+simple = { limit = 5, period = 60 }
+
 [vars]
 INCI_MONTHLY_CAP = "1900"   # INCI API free tier is 2,000 a month
 AI_DAILY_CAP = "60"         # most explanations are written once, then reused

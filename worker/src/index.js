@@ -39,6 +39,12 @@ async function limited(req, env) {
   if (!env.LIMIT) return false;
   try { const r = await env.LIMIT.limit({ key: req.headers.get('CF-Connecting-IP') || 'anon' }); return !r.success; } catch (e) { return false; }
 }
+async function labelLimited(req, env) {
+  if (!env.LABEL_LIMIT) return false;
+  try { const r = await env.LABEL_LIMIT.limit({ key: req.headers.get('CF-Connecting-IP') || 'anon' }); return !r.success; } catch (e) { return false; }
+}
+/* Text that reads like instructions to an AI, not like a product label. */
+const INJECTION = /ignore (all |any |the )?(previous|prior|above|earlier)|disregard (all |any |the )?(previous|prior|above|instructions)|system prompt|developer message|you are (now |an? )?(chatgpt|an? ai|an? assistant|dan)|act as (an? )?(ai|assistant|dan)|new instructions|jailbreak|<\|[a-z_]+\|>|\[\/?(inst|system)\]|```|do anything now/i;
 async function fetchJson(url, init, ms = 6000) {
   const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
   try { const r = await fetch(url, { ...init, signal: c.signal }); return { status: r.status, body: r.ok ? await r.json() : null }; }
@@ -97,10 +103,17 @@ async function lookup(req, env, url) {
 
 /* ---------- shared labels ---------- */
 async function saveLabel(req, env) {
+  if (await labelLimited(req, env)) return json(req, { error: 'slow_down' }, 429);
   let b; try { b = await req.json(); } catch (e) { return json(req, { error: 'bad_json' }, 400); }
   const code = cleanCode(b && b.code), text = String((b && b.text) || '').replace(/\s+/g, ' ').trim().slice(0, 3000);
   const name = String((b && b.name) || '').replace(/\s+/g, ' ').trim().slice(0, 80);
-  if (!code || text.split(/[,;]/).filter(s => /[a-z]{3}/i.test(s)).length < 3 || /https?:\/\/|<[a-z]/i.test(text + name)) return json(req, { error: 'bad_label' }, 400);
+  const parts = text.split(/[,;]/).map(x => x.trim()).filter(Boolean);
+  if (!code || parts.filter(x => /[a-z]{3}/i.test(x)).length < 3 || /https?:\/\/|<[a-z]/i.test(text + name)) return json(req, { error: 'bad_label' }, 400);
+  /* An ingredient is a short phrase. Long sentences or AI-style instructions are not labels. */
+  if (parts.some(x => x.length > 90) || name.length > 80 || INJECTION.test(text + ' ' + name)) {
+    console.log('label rejected: looks like instructions or free text (content not logged)');
+    return json(req, { error: 'bad_label' }, 400);
+  }
   if (await getJ(env, 'label:' + code)) return json(req, { saved: false, reason: 'exists' });   // first save wins
   await putJ(env, 'label:' + code, { name, text, at: Date.now() });
   return json(req, { saved: true });
